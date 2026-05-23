@@ -3,16 +3,107 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tugas;
+use App\Models\Siswa;
+use App\Models\PengumpulanTugas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TugasController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $siswa = Siswa::where('user_id', Auth::id())->first();
+        if (!$siswa) {
+            abort(403, 'Hanya siswa yang dapat mengakses halaman ini.');
+        }
+
+        // Get class IDs for the logged-in student
+        $kelasIds = $siswa->kelas()->pluck('kelas.id')->toArray();
+
+        // If specific task details are requested:
+        if ($request->filled('id')) {
+            $tugas = Tugas::whereIn('kelas_id', $kelasIds)
+                ->with(['pengumpulanTugas' => function ($query) use ($siswa) {
+                    $query->where('siswa_id', $siswa->id);
+                }])
+                ->findOrFail($request->id);
+
+            return view('siswa.tugas_detail', compact('tugas', 'siswa'));
+        }
+
+        // Otherwise get all assignments
+        $tugasList = Tugas::whereIn('kelas_id', $kelasIds)
+            ->with(['pengumpulanTugas' => function ($query) use ($siswa) {
+                $query->where('siswa_id', $siswa->id);
+            }])
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return view('siswa.tugas', compact('tugasList', 'siswa'));
+    }
+
+    /**
+     * Store a newly created resource submission in storage.
+     */
+    public function storeSubmission(Request $request, Tugas $tugas)
+    {
+        $request->validate([
+            'file_jawaban' => 'nullable|file|mimes:pdf,zip,rar,doc,docx,png,jpg,jpeg|max:10240', // 10MB
+            'link' => 'nullable|url|max:255',
+            'catatan' => 'nullable|string|max:1000',
+        ]);
+
+        if (!$request->hasFile('file_jawaban') && !$request->filled('link')) {
+            return back()->with('error', 'Harap unggah file jawaban atau sertakan link tautan!');
+        }
+
+        $siswa = Siswa::where('user_id', Auth::id())->first();
+        if (!$siswa) {
+            abort(403, 'Aksi tidak diizinkan.');
+        }
+
+        // Check if there is already a submission
+        $pengumpulan = PengumpulanTugas::where('tugas_id', $tugas->id)
+            ->where('siswa_id', $siswa->id)
+            ->first();
+
+        // If already graded, cannot modify
+        if ($pengumpulan && $pengumpulan->status === 'dinilai') {
+            return back()->with('error', 'Tugas ini sudah dinilai dan tidak dapat diubah kembali.');
+        }
+
+        $filePath = $pengumpulan ? $pengumpulan->file_path : null;
+
+        if ($request->hasFile('file_jawaban')) {
+            // Delete old file if updating
+            if ($filePath) {
+                Storage::disk('public')->delete($filePath);
+            }
+            $file = $request->file('file_jawaban');
+            $filename = time() . '_' . $siswa->id . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('tugas_jawaban', $filename, 'public');
+        }
+
+        $data = [
+            'tugas_id' => $tugas->id,
+            'siswa_id' => $siswa->id,
+            'file_path' => $filePath,
+            'link' => $request->link,
+            'catatan' => $request->catatan,
+            'status' => 'sudah_mengumpulkan',
+        ];
+
+        if ($pengumpulan) {
+            $pengumpulan->update($data);
+        } else {
+            PengumpulanTugas::create($data);
+        }
+
+        return back()->with('success', 'Tugas berhasil dikumpulkan!');
     }
 
     /**

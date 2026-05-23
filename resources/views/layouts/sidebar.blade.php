@@ -197,10 +197,28 @@
                 {{-- <li class="menu-title">Admin</li> --}}
 
                 <li class="menu-item">
-                    <a href="{{ url('admin/dashboard') }}" class="menu-link">
+                    <a href="{{ url('siswa/dashboard') }}" class="menu-link">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
+                        <span class="menu-icon"><i data-feather="grid"></i></span>
                         <span class="menu-text"> Dashboard </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('siswa/tugas') }}" class="menu-link">
+                        <span class="menu-icon"><i data-feather="clipboard"></i></span>
+                        <span class="menu-text"> Tugas </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('siswa/konsultasi') }}" class="menu-link">
+                        <span class="menu-icon"><i data-feather="message-square"></i></span>
+                        <span class="menu-text"> Konsultasi </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('siswa/nilai') }}" class="menu-link">
+                        <span class="menu-icon"><i data-feather="star"></i></span>
+                        <span class="menu-text"> Nilai </span>
                     </a>
                 </li>
 

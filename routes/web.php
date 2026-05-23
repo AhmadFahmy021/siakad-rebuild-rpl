@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TugasController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('siswa')->middleware(['check.siswa'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexSiswa'])->name('dashboard.siswa');
+        Route::get('/tugas', [TugasController::class, 'index'])->name('siswa.tugas.index');
+        Route::post('/tugas/{tugas}/kumpul', [TugasController::class, 'storeSubmission'])->name('siswa.tugas.submit');
     });
 
     Route::prefix('tu')->middleware(['check.tu'])->group(function () {
