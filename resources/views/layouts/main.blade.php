@@ -29,6 +29,12 @@
 
 		<!-- Icons css -->
 		<link href="{{ asset('assets') }}/css/icons.min.css" rel="stylesheet" type="text/css" />
+
+        {{-- <!-- Sweet Alert-->
+        <link href="{{ asset('assets') }}/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" /> --}}
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     </head>
 
     <body>
@@ -121,6 +127,13 @@
         <!-- Datatables init -->
         <script src="{{ asset('assets') }}/js/pages/datatables.init.js"></script>
 
+        <!-- Sweet Alerts js -->
+        {{-- <script src="{{ asset('assets') }}/libs/sweetalert2/sweetalert2.all.min.js"></script>
 
+        <!-- Sweet alert init js-->
+        <script src="{{ asset('assets') }}/js/pages/sweet-alerts.init.js"></script> --}}
+
+         @include('sweetalert::alert')
+         @yield('js')
     </body>
 </html>
