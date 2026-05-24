@@ -10,4 +10,12 @@ class Nilai extends Model
     use HasUuids;
     protected $guarded = ['id'];
     protected $table = 'nilai';
+
+    /**
+     * Get the subject that this grade belongs to.
+     */
+    public function mataPelajaran()
+    {
+        return $this->belongsTo(MataPelajaran::class, 'matapelajaran_id');
+    }
 }
