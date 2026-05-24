@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\TataUsaha;
+use App\Models\User;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class TataUsahaController extends Controller
 {
@@ -12,7 +14,9 @@ class TataUsahaController extends Controller
      */
     public function index()
     {
-        //
+        $tataUsahas = TataUsaha::with('user')->get();
+        $users = User::all();
+        return view('admin.kelola.tatausaha.index', compact('tataUsahas', 'users'));
     }
 
     /**
@@ -28,7 +32,22 @@ class TataUsahaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user' => 'required|exists:users,id',
+        ]);
+
+        $req = [
+            'user_id' => $request->user,
+        ];
+
+        if (TataUsaha::where('user_id', $request->user)->exists()) {
+            Alert::error('Gagal', 'Tata Usaha sudah terdaftar.');
+            return redirect()->route('tu.index');
+        }
+
+        TataUsaha::create($req);
+        Alert::success('Berhasil', 'Tata Usaha berhasil ditambahkan.');
+        return redirect()->route('tu.index');
     }
 
     /**
@@ -52,7 +71,22 @@ class TataUsahaController extends Controller
      */
     public function update(Request $request, TataUsaha $tataUsaha)
     {
-        //
+        $request->validate([
+            'user' => 'required|exists:users,id',
+        ]);
+
+        $req = [
+            'user_id' => $request->user,
+        ];
+
+        if (TataUsaha::where('user_id', $request->user)->where('id', '!=', $tataUsaha->id)->exists()) {
+            Alert::error('Gagal', 'Tata Usaha sudah terdaftar.');
+            return redirect()->route('tu.index');
+        }
+
+        $tataUsaha->update($req);
+        Alert::success('Berhasil', 'Tata Usaha berhasil diperbarui.');
+        return redirect()->route('tu.index');
     }
 
     /**
@@ -60,6 +94,8 @@ class TataUsahaController extends Controller
      */
     public function destroy(TataUsaha $tataUsaha)
     {
-        //
+        $tataUsaha->delete();
+        Alert::success('Berhasil', 'Tata Usaha berhasil dihapus.');
+        return redirect()->route('tu.index');
     }
 }

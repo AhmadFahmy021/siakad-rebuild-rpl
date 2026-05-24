@@ -50,6 +50,19 @@
                     </span>
 
                     <div class="dropdown-divider"></div>
+                    @if (App\Models\Admin::where('user_id', Auth::id())->exists())
+                        <a href="{{ url('admin/dashboard') }}" class="dropdown-item notify-item">
+                            {{-- <i class="fe-settings"></i> --}}
+                            <span>Admin</span>
+                        </a>
+                    @endif
+                    @if (App\Models\Guru::where('user_id', Auth::id())->exists())
+                        <a href="{{ url('guru/dashboard') }}" class="dropdown-item notify-item">
+                            {{-- <i class="fe-settings"></i> --}}
+                            <span>Guru</span>
+                        </a>
+                    @endif
+                    <div class="dropdown-divider"></div>
 
                     <!-- item-->
                     <form action="{{ route('logout') }}" method="POST">
@@ -58,7 +71,7 @@
                             <i class="fe-log-out"></i>
                             <span>Logout</span>
                         </button>
-                    </form>1
+                    </form>
 
                 </div>
             </li>

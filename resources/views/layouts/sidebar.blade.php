@@ -129,7 +129,14 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="{{ url('admin/kelola/siswa') }}" class="menu-link">
+                    <a href="{{ url('admin/kelola/user') }}" class="menu-link">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="users"></i></span>
+                        <span class="menu-text"> Kelola User </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('admin/pembayaran') }}" class="menu-link">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="dollar-sign"></i></span>
                         <span class="menu-text"> Pembayaran </span>

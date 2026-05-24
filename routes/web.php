@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\TataUsahaController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +21,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::prefix('/kelola')->group(function () {
             Route::resource('/guru', GuruController::class);
-            // Route::resource('/tu', Tu::class);
+            Route::resource('/tu', TataUsahaController::class);
             Route::resource('/siswa', SiswaController::class);
+            Route::resource('/user', UserController::class);
         });
     });
 
