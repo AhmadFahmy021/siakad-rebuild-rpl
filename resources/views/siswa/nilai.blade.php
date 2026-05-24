@@ -84,26 +84,6 @@
                                         } elseif ($finalScore >= 60) {
                                             $predikat = 'C';
                                         }
-
-                                        // Dynamic Predicate matching the mockup scale perfectly
-                                        $predikat = 'D';
-                                        if ($finalScore >= 95) {
-                                            $predikat = 'A+';
-                                        } elseif ($finalScore >= 90) {
-                                            $predikat = 'A';
-                                        } elseif ($finalScore >= 85) {
-                                            $predikat = 'A-';
-                                        } elseif ($finalScore >= 80) {
-                                            $predikat = 'B+';
-                                        } elseif ($finalScore >= 75) {
-                                            $predikat = 'B';
-                                        } elseif ($finalScore >= 70) {
-                                            $predikat = 'B-';
-                                        } elseif ($finalScore >= 65) {
-                                            $predikat = 'C+';
-                                        } elseif ($finalScore >= 60) {
-                                            $predikat = 'C';
-                                        }
                                     @endphp
                                     <tr>
                                         <td>
