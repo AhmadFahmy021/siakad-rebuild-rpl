@@ -13,6 +13,22 @@ class Siswa extends Model
     protected $table = 'siswa';
 
     /**
+     * Get the student's task submissions.
+     */
+    public function pengumpulanTugas()
+    {
+        return $this->hasMany(PengumpulanTugas::class, 'siswa_id');
+    }
+
+    /**
+     * Get the classes that this student belongs to.
+     */
+    public function kelas()
+    {
+        return $this->belongsToMany(Kelas::class, 'siswa_kelas', 'siswa_id', 'kelas_id');
+    }
+
+    /**
      * Get the user that owns the Siswa
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

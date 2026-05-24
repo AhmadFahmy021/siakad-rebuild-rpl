@@ -3,6 +3,9 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TugasController;
+use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\KonsultasiController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TataUsahaController;
 use App\Http\Controllers\UserController;
@@ -33,6 +36,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('siswa')->middleware(['check.siswa'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexSiswa'])->name('dashboard.siswa');
+        Route::get('/tugas', [TugasController::class, 'index'])->name('siswa.tugas.index');
+        Route::post('/tugas/{tugas}/kumpul', [TugasController::class, 'storeSubmission'])->name('siswa.tugas.submit');
+        Route::get('/nilai', [NilaiController::class, 'index'])->name('siswa.nilai.index');
+        Route::get('/konsultasi', [KonsultasiController::class, 'index'])->name('siswa.konsultasi');
     });
 
     Route::prefix('tu')->middleware(['check.tu'])->group(function () {

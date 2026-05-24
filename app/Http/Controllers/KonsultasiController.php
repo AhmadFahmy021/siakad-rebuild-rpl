@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Konsultasi;
+use App\Models\Siswa;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class KonsultasiController extends Controller
@@ -12,7 +14,11 @@ class KonsultasiController extends Controller
      */
     public function index()
     {
-        //
+        $siswa = Siswa::where('user_id', Auth::id())->first();
+        if (!$siswa) {
+            abort(403, 'Hanya siswa yang dapat mengakses halaman ini.');
+        }
+        return view('siswa.konsultasi', compact('siswa'));
     }
 
     /**

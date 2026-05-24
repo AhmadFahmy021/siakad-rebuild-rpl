@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Nilai;
+use App\Models\Siswa;
+use App\Models\PengumpulanTugas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NilaiController extends Controller
 {
@@ -12,7 +15,17 @@ class NilaiController extends Controller
      */
     public function index()
     {
-        //
+        $siswa = Siswa::where('user_id', Auth::id())->first();
+        if (!$siswa) {
+            abort(403, 'Hanya siswa yang dapat mengakses halaman ini.');
+        }
+
+        // Fetch grades only for this student, with subject & class teacher info
+        $nilai = Nilai::where('siswa_id', $siswa->id)
+            ->with(['mataPelajaran', 'kelas.guru.user'])
+            ->get();
+
+        return view('siswa.nilai', compact('nilai'));
     }
 
     /**
