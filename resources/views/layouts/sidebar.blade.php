@@ -107,6 +107,34 @@
                         <span class="menu-text"> Dashboard </span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ url('admin/kelola/guru') }}" class="menu-link">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="users"></i></span>
+                        <span class="menu-text"> Kelola Guru </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('admin/kelola/tu') }}" class="menu-link">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="users"></i></span>
+                        <span class="menu-text"> Kelola TU </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('admin/kelola/siswa') }}" class="menu-link">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="users"></i></span>
+                        <span class="menu-text"> Kelola Siswa </span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('admin/kelola/siswa') }}" class="menu-link">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="dollar-sign"></i></span>
+                        <span class="menu-text"> Pembayaran </span>
+                    </a>
+                </li>
 
             </ul>
         @elseif (App\Models\Guru::where('user_id', Auth::id())->exists())
@@ -224,7 +252,7 @@
 
             </ul>
         @elseif (App\Models\TataUsaha::where('user_id', Auth::id())->exists())
-        <ul class="menu">
+            <ul class="menu">
 
                 {{-- <li class="menu-title">Navigation</li> --}}
 
