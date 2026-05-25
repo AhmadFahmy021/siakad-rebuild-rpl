@@ -7,22 +7,22 @@
                 <div class="page-title-right">
                     {{-- <a href="{{ route('guru.create') }}" class="btn btn-outline-primary btn-sm">Add Guru</a> --}}
                 </div>
-                <h4 class="page-title">Kelola Siswa</h4>
+                <h4 class="page-title">Edit Tagihan</h4>
             </div>
         </div>
     </div>
     <div class="row col-12 ">
         <div class="card">
-            <h4 class="card-header">Edit User</h4>
+            <h4 class="card-header">Edit Tagihan</h4>
             <div class="card-body">
-                <form action="{{ url('admin/kelola/user/' . $user->id) }}" method="POST">
+                <form action="{{ url('admin/tagihan/' . $tagihan->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="form-group mb-3">
-                        <label for="name" class="form-label">Name</label>
+                        <label for="name" class="form-label">Nama Tagihan</label>
                         <input class="form-control @error('name')
                             is-invalid
-                        @enderror" id="name" name="name" type="text" placeholder="Masukkan nama user" value="{{ old('name', $user->name) }}">
+                        @enderror" id="name" name="name" type="text" placeholder="Masukkan nama tagihan" value="{{ old('name', $tagihan->name) }}">
                         @error('name')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -30,36 +30,38 @@
                         @enderror
                     </div>
                     <div class="form-group mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input class="form-control @error('email')
+                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                        <textarea class="form-control @error('deskripsi')
                             is-invalid
-                        @enderror" id="email" name="email" type="email" placeholder="Masukkan email user" value="{{ old('email', $user->email) }}">
-                        @error('email')
+                        @enderror" id="deskripsi" name="deskripsi" placeholder="Masukkan deskripsi">{{ old('deskripsi', $tagihan->deskripsi) }}</textarea>
+                        @error('deskripsi')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
                         @enderror
                     </div>
                     <div class="form-group mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input class="form-control @error('username')
+                        <label for="category" class="form-label">Kategori</label>
+                        <input class="form-control @error('category')
                             is-invalid
-                        @enderror" id="username" name="username" type="text" placeholder="Masukkan username user" value="{{ old('username', $user->username) }}">
-                        @error('username')
+                        @enderror" id="category" name="category" type="text" placeholder="Masukkan kategori" value="{{ old('category', $tagihan->category) }}">
+                        @error('category')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
                         @enderror
                     </div>
-                    @php
-                        use Illuminate\Support\Str;
-                    @endphp
                     <div class="form-group mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input class="form-control @error('password')
+                        <label for="user" class="form-label">Kelas</label>
+                        <select class="form-select @error('user')
                             is-invalid
-                        @enderror" id="password" name="password" type="text" value="{{ Str::random(8) }}" placeholder="Masukkan password user">
-                        @error('password')
+                        @enderror" id="user" name="user">
+                            <option selected value="">Choose a Kelas (jangan pilih kelas apapun jika tagihan digunakan untuk semua kelas)</option>
+                            @foreach ($kelas as $kelas)
+                                <option value="{{ $kelas->id }}" @selected($tagihan->kelas_id == $kelas->id)> Guru :  {{ $kelas->name }} | {{ $kelas->guru->user->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('user')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
@@ -70,7 +72,4 @@
             </div>
         </div>
     </div>
-
-
-
 @endsection

@@ -16,6 +16,7 @@ class TataUsahaController extends Controller
     {
         $tataUsahas = TataUsaha::with('user')->get();
         $users = User::all();
+        confirmDelete("Delete Akses Tata Usaha!","Apakah Anda yakin ingin menghapus akses tata usaha ini?");
         return view('admin.kelola.tatausaha.index', compact('tataUsahas', 'users'));
     }
 

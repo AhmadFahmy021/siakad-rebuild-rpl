@@ -13,6 +13,7 @@ class Admin extends Model
     use HasFactory, HasUuids;
 
     protected $guarded = ['id'];
+    protected $table = 'admins';
 
     /**
      * Get the user that owns the Admin
