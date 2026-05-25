@@ -133,7 +133,7 @@
         <!-- Sweet alert init js-->
         <script src="{{ asset('assets') }}/js/pages/sweet-alerts.init.js"></script> --}}
 
-         @include('sweetalert::alert')
+         {{-- @include('sweetalert::alert') --}}
          @yield('js')
     </body>
 </html>

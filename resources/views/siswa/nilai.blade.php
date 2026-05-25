@@ -37,68 +37,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    $totalNilaiAkhir = 0;
-                                    $totalMataPelajaran = $nilai->count();
-                                @endphp
-
-                                @foreach($nilai as $n)
-                                    @php
-                                        $finalScore = $n->nilai;
-                                        $totalNilaiAkhir += $finalScore;
-
-                                        // Mathematically consistent realistic mocking of Tugas, UTS, UAS components:
-                                        // FinalScore = 0.40 * Tugas + 0.25 * UTS + 0.35 * UAS
-                                        // Let's generate realistic Tugas and UTS around the FinalScore, then compute matching UAS
-                                        $tugasScore = min(100, max(0, $finalScore + rand(2, 6))); 
-                                        $utsScore = min(100, max(0, $finalScore - rand(1, 4)));
-                                        $uasScore = ($finalScore - (0.4 * $tugasScore) - (0.25 * $utsScore)) / 0.35;
-                                        
-                                        // Cap and floor safety
-                                        if ($uasScore > 100) {
-                                            $diff = $uasScore - 100;
-                                            $uasScore = 100;
-                                            $tugasScore = max(0, $tugasScore - ($diff * 0.35 / 0.4));
-                                        } elseif ($uasScore < 0) {
-                                            $diff = 0 - $uasScore;
-                                            $uasScore = 0;
-                                            $tugasScore = min(100, $tugasScore + ($diff * 0.35 / 0.4));
-                                        }
-
-                                        // Dynamic Predicate matching the mockup scale perfectly
-                                        $predikat = 'D';
-                                        if ($finalScore >= 95) {
-                                            $predikat = 'A+';
-                                        } elseif ($finalScore >= 90) {
-                                            $predikat = 'A';
-                                        } elseif ($finalScore >= 85) {
-                                            $predikat = 'A-';
-                                        } elseif ($finalScore >= 80) {
-                                            $predikat = 'B+';
-                                        } elseif ($finalScore >= 75) {
-                                            $predikat = 'B';
-                                        } elseif ($finalScore >= 70) {
-                                            $predikat = 'B-';
-                                        } elseif ($finalScore >= 65) {
-                                            $predikat = 'C+';
-                                        } elseif ($finalScore >= 60) {
-                                            $predikat = 'C';
-                                        }
-                                    @endphp
+                                @foreach($nilaiTransformed as $n)
                                     <tr>
                                         <td>
-                                            <span class="d-block fw-semibold text-dark font-14">{{ $n->mataPelajaran->nama ?? 'Tidak Diketahui' }}</span>
+                                            <span class="d-block fw-semibold text-dark font-14">{{ $n->mata_pelajaran_nama }}</span>
                                         </td>
-                                        <td class="text-center font-14 text-dark">{{ number_format($tugasScore, 1) }}</td>
-                                        <td class="text-center font-14 text-dark">{{ number_format($utsScore, 1) }}</td>
-                                        <td class="text-center font-14 text-dark">{{ number_format($uasScore, 1) }}</td>
+                                        <td class="text-center font-14 text-dark">{{ number_format($n->tugas, 1) }}</td>
+                                        <td class="text-center font-14 text-dark">{{ number_format($n->uts, 1) }}</td>
+                                        <td class="text-center font-14 text-dark">{{ number_format($n->uas, 1) }}</td>
                                         <td class="text-center">
                                             <span class="badge bg-soft-blue text-blue font-13 px-2 py-1 rounded" style="background-color: rgba(91, 109, 240, 0.15) !important; color: #5b6df0 !important; font-size: 13px !important; font-weight: 600;">
-                                                {{ number_format($finalScore, 1) }}
+                                                {{ number_format($n->nilai_akhir, 1) }}
                                             </span>
                                         </td>
                                         <td class="text-center fw-semibold font-14" style="color: #5b6df0 !important;">
-                                            {{ $predikat }}
+                                            {{ $n->predikat }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -108,9 +61,6 @@
                 </div>
 
                 <!-- Academic Summary Footer -->
-                @php
-                    $rataRata = $totalMataPelajaran > 0 ? ($totalNilaiAkhir / $totalMataPelajaran) : 0;
-                @endphp
                 <div class="card-footer bg-white border-top p-3">
                     <div class="d-flex align-items-center gap-4">
                         <div>
