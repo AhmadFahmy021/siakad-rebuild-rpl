@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kelas;
 use App\Models\Tagihan;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class TagihanController extends Controller
 {
@@ -12,7 +14,10 @@ class TagihanController extends Controller
      */
     public function index()
     {
-        //
+        $tagihans = Tagihan::all();
+        $kelas = Kelas::with(['guru', 'guru.user'])->get();
+        confirmDelete("Delete Tagihan!","Apakah Anda yakin ingin menghapus tagihan ini?");
+        return view('admin.tagihan.index', compact('tagihans', 'kelas'));
     }
 
     /**
@@ -28,7 +33,22 @@ class TagihanController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'deskripsi' => 'required',
+            'category' => 'required',
+        ]);
+
+        $req = [
+            'name' => $request->name,
+            'deskripsi' => $request->deskripsi,
+            'category' => $request->category,
+            'kelas_id' => $request->user, // Assuming the select field name is 'kelas'
+        ];
+
+        Tagihan::create($req);
+        Alert::success('Berhasil', 'Tagihan berhasil ditambahkan.');
+        return redirect('admin/tagihan');
     }
 
     /**
@@ -44,7 +64,9 @@ class TagihanController extends Controller
      */
     public function edit(Tagihan $tagihan)
     {
-        //
+        $kelas = Kelas::with(['guru', 'guru.user'])->get();
+        return view('admin.tagihan.edit', compact('tagihan', 'kelas'));
+        // return view('admin.tagihan.edit', compact('tagihan'));
     }
 
     /**
@@ -52,7 +74,22 @@ class TagihanController extends Controller
      */
     public function update(Request $request, Tagihan $tagihan)
     {
-        //
+        $request->validate([
+            'name' => 'sometimes',
+            'deskripsi' => 'sometimes',
+            'category' => 'sometimes',
+        ]);
+
+        $req = [
+            'name' => $request->name,
+            'deskripsi' => $request->deskripsi,
+            'category' => $request->category,
+            'kelas_id' => $request->user, // Assuming the select field name is 'kelas'
+        ];
+
+        $tagihan->update($req);
+        Alert::success('Berhasil', 'Tagihan berhasil diperbarui.');
+        return redirect('admin/tagihan');
     }
 
     /**
@@ -60,6 +97,8 @@ class TagihanController extends Controller
      */
     public function destroy(Tagihan $tagihan)
     {
-        //
+        $tagihan->delete();
+        Alert::success('Berhasil', 'Tagihan berhasil dihapus.');
+        return redirect('admin/tagihan');
     }
 }

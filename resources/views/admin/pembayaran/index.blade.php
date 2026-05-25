@@ -6,9 +6,9 @@
             <div class="page-title-box">
                 <div class="page-title-right">
                     {{-- <a href="{{ route('guru.create') }}" class="btn btn-outline-primary btn-sm">Add Guru</a> --}}
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-user-modal">Add Users</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-tagihan-modal">Add Tagihan</button>
                 </div>
-                <h4 class="page-title">Kelola Users</h4>
+                <h4 class="page-title">Tagihan</h4>
             </div>
         </div>
     </div>
@@ -68,7 +68,7 @@
                     <h4 class="modal-title" id="add-user-modalLabel">Add User</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('admin/kelola/user') }}" method="POST">
+                <form action="{{ url('admin/tagihan') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         {{-- <h6>Text in a modal</h6>
@@ -151,7 +151,5 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div>
-
-
 
 @endsection

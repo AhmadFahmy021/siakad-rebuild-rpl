@@ -16,6 +16,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
+        confirmDelete("Delete User!","Apakah Anda yakin ingin menghapus user ini?");
         return view('admin.kelola.user.index', compact('users'));
     }
 
@@ -93,6 +94,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        Alert::success('Berhasil', 'User berhasil dihapus.');
+        return redirect('/admin/kelola/user');
     }
 }

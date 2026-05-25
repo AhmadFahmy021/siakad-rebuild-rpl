@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TugasController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\KonsultasiController;
+use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\TataUsahaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +31,12 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('/tu', TataUsahaController::class);
             Route::resource('/siswa', SiswaController::class);
             Route::resource('/user', UserController::class);
+            Route::resource('/account/admin', AdminController::class);
         });
+        Route::resource('/pembayaran', PembayaranController::class);
+        Route::resource('/bank', BankController::class);
+        Route::resource('/tagihan', TagihanController::class);
+
     });
 
     Route::prefix('guru')->middleware(['check.guru'])->group(function () {
