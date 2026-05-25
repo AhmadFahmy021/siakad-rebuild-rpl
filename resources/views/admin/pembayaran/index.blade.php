@@ -6,7 +6,7 @@
             <div class="page-title-box">
                 <div class="page-title-right">
                     {{-- <a href="{{ route('guru.create') }}" class="btn btn-outline-primary btn-sm">Add Guru</a> --}}
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-tagihan-modal">Add Tagihan</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-pembayaran-modal">Add Pembayaran</button>
                 </div>
                 <h4 class="page-title">Tagihan</h4>
             </div>
@@ -29,25 +29,47 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Email</th>
-                                <th>Username</th>
-                                {{-- <th>Orang Tua</th> --}}
+                                <th>Nominal</th>
+                                <th>Bukti Pembayaran</th>
+                                <th>Tanggal</th>
+                                <th>Kelas</th>
+                                <th>Semester</th>
+                                <th>Tagihan</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
 
 
                         <tbody>
-                            @foreach ($users as $item)
+                            @foreach ($pembayarans as $item)
                                 <tr>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->username }}</td>
-                                    {{-- <td>{{ $item->nama_ortu }}</td> --}}
+                                    <td>{{ $item->siswa->user->name }}</td>
+                                    <td>{{ $item->nominal }}</td>
                                     <td>
-                                        <a href="{{ url('admin/kelola/user/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                        @if ($item->bukti_pembayaran)
+                                            <img src="{{ asset('storage/' . $item->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-thumbnail" style="max-width: 100px;">
+                                        @else
+                                            <span class="badge bg-danger">Tidak Ada Bukti</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $item->tanggal->format('d-m-Y') }}</td>
+                                    <td>{{ $item->kelas->name }}</td>
+                                    <td>{{ $item->semester }}</td>
+                                    <td>{{ $item->tagihan->name }}</td>
+                                    <td>
+                                        @if ($item->status == 'pending')
+                                            <span class="badge bg-warning">Pending</span>
+                                        @elseif ($item->status == 'approved')
+                                            <span class="badge bg-success">Approved</span>
+                                        @else
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ url('admin/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
                                         {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
-                                        <a href="{{ url('admin/kelola/user/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
+                                        <a href="{{ url('admin/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
                                             disabled
                                         @endif" data-confirm-delete="true">Delete</a>
                                     </td>
@@ -61,81 +83,113 @@
         </div><!-- end col-->
     </div>
     <!-- end row-->
-    <div id="add-user-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="standard-modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <div id="add-pembayaran-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="standard-modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="add-user-modalLabel">Add User</h4>
+                    <h4 class="modal-title" id="add-pembayaran-modalLabel">Add Pembayaran</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('admin/tagihan') }}" method="POST">
+                <form action="{{ url('admin/pembayaran') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body">
-                        {{-- <h6>Text in a modal</h6>
-                        <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</p>
-                        <hr>
-                        <h6>Overflowing text to show scroll behavior</h6>
-                        <p>Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
-                        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
-                        <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p> --}}
-                        {{-- <div class="form-group mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <select class="form-select @error('user')
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                        <div class="form-group mb-3">
+                            <label for="kelas" class="form-label">Kelas</label>
+                            <select class="form-select @error('kelas')
                                 is-invalid
-                            @enderror" id="name" name="user">
-                                <option selected disabled>Choose a user</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} | {{ $user->email }} | {{ $user->username }}</option>
+                            @enderror" id="kelas" name="kelas" onchange="changeKelas(this.value); changeTagihan(this.value);">
+                                <option selected disabled>Choose a kelas</option>
+                                @foreach ($kelas as $k)
+                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
                                 @endforeach
                             </select>
-                            @error('user')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div> --}}
-                        <div class="form-group mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input class="form-control @error('name')
-                                is-invalid
-                            @enderror" id="name" name="name" type="text" placeholder="Masukkan nama user">
-                            @error('name')
+                            @error('kelas')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
                         <div class="form-group mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input class="form-control @error('email')
+                            <label for="siswa" class="form-label">Siswa</label>
+                            <select class="form-select @error('siswa')
                                 is-invalid
-                            @enderror" id="email" name="email" type="email" placeholder="Masukkan email user">
-                            @error('email')
+                            @enderror" id="siswa" name="siswa">
+                                <option selected disabled>Choose a siswa</option>
+                            </select>
+                            @error('siswa')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
                         <div class="form-group mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input class="form-control @error('username')
+                            <label for="tanggal" class="form-label">Tanggal</label>
+                            <input class="form-control @error('tanggal')
                                 is-invalid
-                            @enderror" id="username" name="username" type="text" placeholder="Masukkan username user">
-                            @error('username')
+                            @enderror" id="tanggal" name="tanggal" type="date">
+                            @error('tanggal')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
-                        @php
-                            use Illuminate\Support\Str;
-                        @endphp
                         <div class="form-group mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input class="form-control @error('password')
+                            <label for="nominal" class="form-label">Nominal</label>
+                            <input class="form-control @error('nominal')
                                 is-invalid
-                            @enderror" id="password" name="password" type="text" value="{{ Str::random(8) }}" placeholder="Masukkan password user" disabled>
-                            @error('password')
+                            @enderror" id="nominal" name="nominal" type="number" placeholder="Masukkan nominal pembayaran">
+                            @error('nominal')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="semester" class="form-label">Semester</label>
+                            <input class="form-control @error('semester')
+                                is-invalid
+                            @enderror" id="semester" name="semester" type="text" placeholder="Masukkan semester pembayaran">
+                            @error('semester')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="tagihan" class="form-label">Tagihan</label>
+                            <select class="form-select @error('tagihan')
+                                is-invalid
+                            @enderror" id="tagihan" name="tagihan">
+                                <option selected disabled>Choose a tagihan</option>
+                            </select>
+                            @error('tagihan')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="bukti_pembayaran" class="form-label">Bukti Pembayaran</label>
+                            <input class="form-control @error('bukti_pembayaran')
+                                is-invalid
+                            @enderror" id="bukti_pembayaran" name="bukti_pembayaran" type="file" placeholder="Masukkan bukti pembayaran">
+                            @error('bukti_pembayaran')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="statuspembayaran" class="form-label">Status</label>
+                            <select class="form-select @error('status')
+                                is-invalid
+                            @enderror" id="statuspembayaran" name="status">
+                                <option selected>Choose a status</option>
+                                <option value="approved">Approve | Lunas</option>
+                                <option value="pending">Pending | Perlu Diverifikasi</option>
+                                <option value="rejected">Reject | Belum Lunas</option>
+                            </select>
+                            @error('status')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -152,4 +206,75 @@
         </div><!-- /.modal-dialog -->
     </div>
 
+
+@endsection
+@section('js')
+<script>
+    function changeKelas(kelasId) {
+        $('#siswa').html(
+            '<option selected disabled>Loading...</option>'
+        );
+
+        $.ajax({
+            url: '/admin/ajax/pembayaran/siswa/' + kelasId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                $('#siswa').html(
+                    '<option selected disabled>Pilih siswa</option>'
+                );
+                $.each(response, function (k, v) {
+
+                    $('#siswa').append(`
+                        <option value="${v.siswa.id}">
+                            ${v.siswa.user.name} |
+                            ${v.siswa.user.email}
+                        </option>
+                    `);
+
+                });
+
+            },
+            error: function () {
+
+                alert('Gagal mengambil data siswa');
+
+            }
+
+        });
+    }
+    function changeTagihan(tagihanId) {
+        $('#tagihan').html(
+            '<option selected disabled>Loading...</option>'
+        );
+
+        $.ajax({
+            url: '/admin/ajax/pembayaran/tagihan/' + tagihanId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+
+                $('#tagihan').html(
+                    '<option selected disabled>Pilih tagihan</option>'
+                );
+                $.each(response, function (k, v) {
+
+                    $('#tagihan').append(`
+                        <option value="${v.id}">
+                            ${v.name} | ${v.category}
+                        </option>
+                    `);
+
+                });
+
+            },
+            error: function () {
+
+                alert('Gagal mengambil data tagihan');
+
+            }
+
+        });
+    }
+</script>
 @endsection
