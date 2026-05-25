@@ -6,28 +6,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Pembayaran extends Model
+class SiswaKelas extends Model
 {
     use HasUuids;
     protected $guarded = ['id'];
-    protected $table = 'pembayaran';
-
-    protected $casts = [
-        'tanggal' => 'datetime',
-    ];
+    protected $table = 'siswa_kelas';
 
     /**
-     * Get the tagihan that owns the Pembayaran
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function tagihan(): BelongsTo
-    {
-        return $this->belongsTo(Tagihan::class, 'tagihan_id', 'id');
-    }
-
-    /**
-     * Get the kelas that owns the Pembayaran
+     * Get the kelas that owns the SiswaKelas
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -37,7 +23,7 @@ class Pembayaran extends Model
     }
 
     /**
-     * Get the siswa that owns the Pembayaran
+     * Get the siswa that owns the SiswaKelas
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

@@ -21,4 +21,14 @@ class Kelas extends Model
     {
         return $this->belongsTo(Guru::class, 'guru_id', 'id');
     }
+
+    /**
+     * Get the siswa that owns the Kelas
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function siswa(): BelongsTo
+    {
+        return $this->belongsTo(Siswa::class, 'siswa_id', 'id');
+    }
 }

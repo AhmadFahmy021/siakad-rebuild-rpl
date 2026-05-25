@@ -100,7 +100,7 @@
 
         </div>
         <!-- END wrapper -->
-
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
         <!-- Vendor js -->
         <script src="{{ asset('assets') }}/js/vendor.min.js"></script>

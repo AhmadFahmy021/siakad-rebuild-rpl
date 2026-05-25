@@ -37,6 +37,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('/bank', BankController::class);
         Route::resource('/tagihan', TagihanController::class);
 
+        Route::get('/ajax/pembayaran/siswa/{kelasId}', [PembayaranController::class, 'getSiswaByKelas']);
+        Route::get('/ajax/pembayaran/tagihan/{kelasId}', [PembayaranController::class, 'getTagihanByKelasId']);
     });
 
     Route::prefix('guru')->middleware(['check.guru'])->group(function () {
