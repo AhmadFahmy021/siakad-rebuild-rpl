@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class SiswaController extends Controller
         $siswasUserIds = $siswas->pluck('user_id');
         $users = User::whereNotIn('id', $admins)->whereNotIn('id', $siswasUserIds)->get();
         // dd($users);
+        confirmDelete("Delete Siswa!","Apakah Anda yakin ingin menghapus siswa ini?");
         return view('admin.kelola.siswa.index', compact('siswas', 'users'));
     }
 

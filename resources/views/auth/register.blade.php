@@ -35,15 +35,15 @@
                         <!-- Logo -->
                         <div class="auth-brand text-center text-lg-start">
                             <div class="auth-brand">
-                                <a href="index.html" class="logo logo-dark text-center">
+                                <a href="{{ url('login') }}" class="logo logo-dark text-center">
                                     <span class="logo-lg">
-                                        <img src="{{ asset('assets') }}/images/logo-dark.png" alt="" height="22">
+                                        <img src="{{ asset('assets') }}/images/logo-dark-3.png" width="150px" height="auto" alt="" >
                                     </span>
                                 </a>
 
-                                <a href="index.html" class="logo logo-light text-center">
+                                <a href="{{ url('login') }}" class="logo logo-light text-center">
                                     <span class="logo-lg">
-                                        <img src="{{ asset('assets') }}/images/logo-light.png" alt="" height="22">
+                                        <img src="{{ asset('assets') }}/images/logo-dark-3.png" width="150px" height="auto" alt="" >
                                     </span>
                                 </a>
                             </div>

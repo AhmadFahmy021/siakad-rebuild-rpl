@@ -6,9 +6,9 @@
             <div class="page-title-box">
                 <div class="page-title-right">
                     {{-- <a href="{{ route('guru.create') }}" class="btn btn-outline-primary btn-sm">Add Guru</a> --}}
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-user-modal">Add Users</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-admin-modal">Add Admin</button>
                 </div>
-                <h4 class="page-title">Kelola Users</h4>
+                <h4 class="page-title">Kelola Admin</h4>
             </div>
         </div>
     </div>
@@ -31,23 +31,23 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Username</th>
-                                {{-- <th>Orang Tua</th> --}}
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
 
 
                         <tbody>
-                            @foreach ($users as $item)
+                            @foreach ($admins as $item)
                                 <tr>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->username }}</td>
-                                    {{-- <td>{{ $item->nama_ortu }}</td> --}}
+                                    <td>{{ $item->user->name }}</td>
+                                    <td>{{ $item->user->email }}</td>
+                                    <td>{{ $item->user->username }}</td>
+                                    <td>{{ $item->role }}</td>
                                     <td>
-                                        <a href="{{ url('admin/kelola/user/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                        <a href="{{ url('admin/kelola/account/admin/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
                                         {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
-                                        <a href="{{ url('admin/kelola/user/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
+                                        <a href="{{ url('admin/kelola/account/admin/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->user_id || $item->id === '906c74d1-1950-4e71-bc0a-d8b6505e0b28' )
                                             disabled
                                         @endif" data-confirm-delete="true">Delete</a>
                                     </td>
@@ -61,14 +61,14 @@
         </div><!-- end col-->
     </div>
     <!-- end row-->
-    <div id="add-user-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="standard-modalLabel" aria-hidden="true">
+    <div id="add-admin-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="standard-modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="add-user-modalLabel">Add User</h4>
+                    <h4 class="modal-title" id="add-admin-modalLabel">Add Admin</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('admin/kelola/user') }}" method="POST">
+                <form action="{{ url('admin/kelola/account/admin') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         {{-- <h6>Text in a modal</h6>
@@ -78,7 +78,7 @@
                         <p>Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
                         <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
                         <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p> --}}
-                        {{-- <div class="form-group mb-3">
+                        <div class="form-group mb-3">
                             <label for="name" class="form-label">Name</label>
                             <select class="form-select @error('user')
                                 is-invalid
@@ -93,8 +93,19 @@
                                     {{ $message }}
                                 </div>
                             @enderror
-                        </div> --}}
+                        </div>
                         <div class="form-group mb-3">
+                            <label for="name" class="form-label">Role</label>
+                            <input class="form-control @error('role')
+                                is-invalid
+                            @enderror" id="name" name="role" type="text" placeholder="Masukkan role user">
+                            @error('role')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        {{-- <div class="form-group mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input class="form-control @error('name')
                                 is-invalid
@@ -140,7 +151,7 @@
                                     {{ $message }}
                                 </div>
                             @enderror
-                        </div>
+                        </div> --}}
 
                     </div>
                     <div class="modal-footer">

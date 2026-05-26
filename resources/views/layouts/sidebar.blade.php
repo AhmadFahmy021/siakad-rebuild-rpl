@@ -4,14 +4,16 @@
     <div class="logo-box">
         <!-- Brand Logo Light -->
         <a href="index.html" class="logo-light">
-            <img src="{{ asset('assets') }}/images/logo-light.png" alt="logo" class="logo-lg">
-            <img src="{{ asset('assets') }}/images/logo-sm.png" alt="small logo" class="logo-sm">
+            {{-- <img src="{{ asset('assets') }}/images/logo-dark-3.png" width="50%" alt="logo" class="logo-lg"> --}}
+            <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 60px; height: auto;" alt="dark logo" class="logo-lg">
+            <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 50px; height: auto;" alt="small logo" class="logo-sm">
+            {{-- <img src="{{ asset('assets') }}/images/logo-dark-3.png" alt="small logo" class="logo-sm"> --}}
         </a>
 
         <!-- Brand Logo Dark -->
         <a href="index.html" class="logo-dark">
-            <img src="{{ asset('assets') }}/images/logo-dark.png" alt="dark logo" class="logo-lg">
-            <img src="{{ asset('assets') }}/images/logo-sm.png" alt="small logo" class="logo-sm">
+            <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 60px; height: auto;" alt="dark logo" class="logo-lg">
+            <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 50px; height: auto;" alt="small logo" class="logo-sm">
         </a>
     </div>
 
@@ -60,253 +62,132 @@
         use App\Models\Admin;
         @endphp --}}
         <!--- Menu -->
-        @if (App\Models\Admin::where('user_id', Auth::id())->exists())
+        <ul class="menu">
 
-            <ul class="menu">
+            {{-- ADMIN --}}
+            @if(Request::is('admin/*'))
 
-                {{-- <li class="menu-title">Navigation</li> --}}
-
-                {{-- <li class="menu-item">
-                    <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
-                        <span class="menu-text"> Dashboards </span>
-                        <span class="badge bg-success rounded-pill ms-auto">4</span>
-                    </a>
-                    <div class="collapse" id="menuDashboards">
-                        <ul class="sub-menu">
-                            <li class="menu-item">
-                                <a href="index.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 1</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-2.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 2</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-3.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 3</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-4.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 4</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> --}}
 
                 {{-- <li class="menu-title">Admin</li> --}}
 
-                <li class="menu-item">
-                    <a href="{{ url('admin/dashboard') }}" class="menu-link">
+                <li class="menu-item {{ Request::is('admin/dashboard') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/dashboard') }}" class="menu-link {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="airplay"></i></span>
                         <span class="menu-text"> Dashboard </span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="{{ url('admin/kelola/guru') }}" class="menu-link">
+
+                <li class="menu-title">Management Sekolah</li>
+
+                <li class="menu-item {{ Request::is('admin/kelola/guru/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/kelola/guru') }}" class="menu-link {{ Request::is('admin/kelola/guru') || Request::is('admin/kelola/guru/*') ? 'active' : '' }}">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="users"></i></span>
                         <span class="menu-text"> Kelola Guru </span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="{{ url('admin/kelola/tu') }}" class="menu-link">
+                <li class="menu-item {{ Request::is('admin/kelola/tu/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/kelola/tu') }}" class="menu-link {{ Request::is('admin/kelola/tu') || Request::is('admin/kelola/tu/*') ? 'active' : '' }}">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="users"></i></span>
                         <span class="menu-text"> Kelola TU </span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="{{ url('admin/kelola/siswa') }}" class="menu-link">
+                <li class="menu-item {{ Request::is('admin/kelola/siswa/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/kelola/siswa') }}" class="menu-link {{ Request::is('admin/kelola/siswa') || Request::is('admin/kelola/siswa/*') ? 'active' : '' }}">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="users"></i></span>
                         <span class="menu-text"> Kelola Siswa </span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="{{ url('admin/kelola/user') }}" class="menu-link">
+                <li class="menu-item {{ Request::is('admin/kelola/user/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/kelola/user') }}" class="menu-link {{ Request::is('admin/kelola/user') || Request::is('admin/kelola/user/*') ? 'active' : '' }}">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="users"></i></span>
                         <span class="menu-text"> Kelola User </span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="{{ url('admin/pembayaran') }}" class="menu-link">
+                <li class="menu-item {{ Request::is('admin/kelola/account/admin/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/kelola/account/admin') }}" class="menu-link {{ Request::is('admin/kelola/account/admin') || Request::is('admin/kelola/account/admin/*') ? 'active' : '' }}">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="users"></i></span>
+                        <span class="menu-text"> Kelola Admin </span>
+                    </a>
+                </li>
+
+                <li class="menu-title">Bank / Pembayaran</li>
+
+                <li class="menu-item {{ Request::is('admin/tagihan/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/tagihan') }}" class="menu-link {{ Request::is('admin/tagihan') || Request::is('admin/tagihan/*') ? 'active' : '' }}">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="dollar-sign"></i></span>
+                        <span class="menu-text"> Tagihan </span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('admin/bank/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/bank') }}" class="menu-link {{ Request::is('admin/bank') || Request::is('admin/bank/*') ? 'active' : '' }}">
+                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
+                        <span class="menu-icon"><i data-feather="dollar-sign"></i></span>
+                        <span class="menu-text"> Bank </span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('admin/pembayaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('admin/pembayaran') }}" class="menu-link {{ Request::is('admin/pembayaran') || Request::is('admin/pembayaran/*') ? 'active' : '' }}">
                         {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
                         <span class="menu-icon"><i data-feather="dollar-sign"></i></span>
                         <span class="menu-text"> Pembayaran </span>
                     </a>
                 </li>
 
-            </ul>
-        @elseif (App\Models\Guru::where('user_id', Auth::id())->exists())
-            <ul class="menu">
+            @endif
 
-                {{-- <li class="menu-title">Navigation</li> --}}
 
-                {{-- <li class="menu-item">
-                    <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
-                        <span class="menu-text"> Dashboards </span>
-                        <span class="badge bg-success rounded-pill ms-auto">4</span>
-                    </a>
-                    <div class="collapse" id="menuDashboards">
-                        <ul class="sub-menu">
-                            <li class="menu-item">
-                                <a href="index.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 1</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-2.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 2</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-3.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 3</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-4.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 4</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> --}}
+            {{-- GURU --}}
+            @if(Request::is('guru/*'))
 
-                {{-- <li class="menu-title">Admin</li> --}}
-
-                <li class="menu-item">
-                    <a href="{{ url('admin/dashboard') }}" class="menu-link">
-                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
-                        <span class="menu-text"> Dashboard </span>
+                <li class="menu-item {{ Request::is('guru/dashboard') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('guru/dashboard') }}" class="menu-link">
+                        <span class="menu-icon">
+                            <i data-feather="airplay"></i>
+                        </span>
+                        <span class="menu-text">Dashboard Guru</span>
                     </a>
                 </li>
 
-            </ul>
-        @elseif (App\Models\Siswa::where('user_id', Auth::id())->exists())
-            <ul class="menu">
+            @endif
 
-                {{-- <li class="menu-title">Navigation</li> --}}
 
-                {{-- <li class="menu-item">
-                    <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
-                        <span class="menu-text"> Dashboards </span>
-                        <span class="badge bg-success rounded-pill ms-auto">4</span>
-                    </a>
-                    <div class="collapse" id="menuDashboards">
-                        <ul class="sub-menu">
-                            <li class="menu-item">
-                                <a href="index.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 1</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-2.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 2</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-3.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 3</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-4.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 4</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> --}}
+            {{-- SISWA --}}
+            @if(Request::is('siswa/*'))
 
-                {{-- <li class="menu-title">Admin</li> --}}
-
-                <li class="menu-item">
-                    <a href="{{ url('siswa/dashboard') }}" class="menu-link">
-                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
-                        <span class="menu-icon"><i data-feather="grid"></i></span>
-                        <span class="menu-text"> Dashboard </span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="{{ url('siswa/tugas') }}" class="menu-link">
-                        <span class="menu-icon"><i data-feather="clipboard"></i></span>
-                        <span class="menu-text"> Tugas </span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="{{ url('siswa/konsultasi') }}" class="menu-link">
-                        <span class="menu-icon"><i data-feather="message-square"></i></span>
-                        <span class="menu-text"> Konsultasi </span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="{{ url('siswa/nilai') }}" class="menu-link">
-                        <span class="menu-icon"><i data-feather="star"></i></span>
-                        <span class="menu-text"> Nilai </span>
+                <li class="menu-item {{ Request::is('siswa/dashboard') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/dashboard') }}" class="menu-link {{ Request::is('siswa/dashboard') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="grid"></i>
+                        </span>
+                        <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
 
-            </ul>
-        @elseif (App\Models\TataUsaha::where('user_id', Auth::id())->exists())
-            <ul class="menu">
+            @endif
 
-                {{-- <li class="menu-title">Navigation</li> --}}
 
-                {{-- <li class="menu-item">
-                    <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
-                        <span class="menu-text"> Dashboards </span>
-                        <span class="badge bg-success rounded-pill ms-auto">4</span>
-                    </a>
-                    <div class="collapse" id="menuDashboards">
-                        <ul class="sub-menu">
-                            <li class="menu-item">
-                                <a href="index.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 1</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-2.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 2</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-3.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 3</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="dashboard-4.html" class="menu-link">
-                                    <span class="menu-text">Dashboard 4</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> --}}
+            {{-- TU --}}
+            @if(Request::is('tu/*'))
 
-                {{-- <li class="menu-title">Admin</li> --}}
-
-                <li class="menu-item">
-                    <a href="{{ url('admin/dashboard') }}" class="menu-link">
-                        {{-- <span class="menu-icon"><i data-feather="calendar"></i></span> --}}
-                        <span class="menu-icon"><i data-feather="airplay"></i></span>
-                        <span class="menu-text"> Dashboard </span>
+                <li class="menu-item {{ Request::is('tu/dashboard') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/dashboard') }}" class="menu-link {{ Request::is('tu/dashboard') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="airplay"></i>
+                        </span>
+                        <span class="menu-text">Dashboard TU</span>
                     </a>
                 </li>
 
-            </ul>
-        @endif
+            @endif
+
+        </ul>
         <!--- End Menu -->
         <div class="clearfix"></div>
     </div>

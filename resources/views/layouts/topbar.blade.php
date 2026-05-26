@@ -50,18 +50,33 @@
                     </span>
 
                     <div class="dropdown-divider"></div>
-                    @if (App\Models\Admin::where('user_id', Auth::id())->exists())
-                        <a href="{{ url('admin/dashboard') }}" class="dropdown-item notify-item">
-                            {{-- <i class="fe-settings"></i> --}}
-                            <span>Admin</span>
-                        </a>
-                    @endif
-                    @if (App\Models\Guru::where('user_id', Auth::id())->exists())
-                        <a href="{{ url('guru/dashboard') }}" class="dropdown-item notify-item">
-                            {{-- <i class="fe-settings"></i> --}}
-                            <span>Guru</span>
-                        </a>
-                    @endif
+                        @if (App\Models\Admin::where('user_id', Auth::id())->exists())
+                            <a href="{{ url('admin/dashboard') }}"
+                            class="dropdown-item notify-item {{ Request::is('admin/*') ? 'active' : '' }}">
+                                <span>Admin</span>
+                            </a>
+                        @endif
+
+                        @if (App\Models\Guru::where('user_id', Auth::id())->exists())
+                            <a href="{{ url('guru/dashboard') }}"
+                            class="dropdown-item notify-item {{ Request::is('guru/*') ? 'active' : '' }}">
+                                <span>Guru</span>
+                            </a>
+                        @endif
+
+                        @if (App\Models\TataUsaha::where('user_id', Auth::id())->exists())
+                            <a href="{{ url('tu/dashboard') }}"
+                            class="dropdown-item notify-item {{ Request::is('tu/*') ? 'active' : '' }}">
+                                <span>Tata Usaha</span>
+                            </a>
+                        @endif
+
+                        @if (App\Models\Siswa::where('user_id', Auth::id())->exists())
+                            <a href="{{ url('siswa/dashboard') }}"
+                            class="dropdown-item notify-item {{ Request::is('siswa/*') ? 'active' : '' }}">
+                                <span>Siswa</span>
+                            </a>
+                        @endif
                     <div class="dropdown-divider"></div>
 
                     <!-- item-->
