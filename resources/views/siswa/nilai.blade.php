@@ -24,40 +24,38 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr class="text-uppercase text-muted font-11 tracking-wider" style="letter-spacing: 0.5px;">
-                                    <th>Mata Pelajaran</th>
-                                    <th class="text-center">Tugas (40%)</th>
-                                    <th class="text-center">UTS (25%)</th>
-                                    <th class="text-center">UAS (35%)</th>
-                                    <th class="text-center">Nilai Akhir</th>
-                                    <th class="text-center">Predikat</th>
+                    <table id="basic-datatable" class="table table-hover dt-responsive nowrap w-100 align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="text-uppercase text-muted font-11 tracking-wider" style="letter-spacing: 0.5px;">
+                                <th>Mata Pelajaran</th>
+                                <th class="text-center">Tugas (40%)</th>
+                                <th class="text-center">UTS (25%)</th>
+                                <th class="text-center">UAS (35%)</th>
+                                <th class="text-center">Nilai Akhir</th>
+                                <th class="text-center">Predikat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($nilaiTransformed as $n)
+                                <tr>
+                                    <td>
+                                        <span class="d-block fw-semibold text-dark font-14">{{ $n->mata_pelajaran_nama }}</span>
+                                    </td>
+                                    <td class="text-center font-14 text-dark">{{ number_format($n->tugas, 1) }}</td>
+                                    <td class="text-center font-14 text-dark">{{ number_format($n->uts, 1) }}</td>
+                                    <td class="text-center font-14 text-dark">{{ number_format($n->uas, 1) }}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-soft-blue text-blue font-13 px-2 py-1 rounded" style="background-color: rgba(91, 109, 240, 0.15) !important; color: #5b6df0 !important; font-size: 13px !important; font-weight: 600;">
+                                            {{ number_format($n->nilai_akhir, 1) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center fw-semibold font-14" style="color: #5b6df0 !important;">
+                                        {{ $n->predikat }}
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($nilaiTransformed as $n)
-                                    <tr>
-                                        <td>
-                                            <span class="d-block fw-semibold text-dark font-14">{{ $n->mata_pelajaran_nama }}</span>
-                                        </td>
-                                        <td class="text-center font-14 text-dark">{{ number_format($n->tugas, 1) }}</td>
-                                        <td class="text-center font-14 text-dark">{{ number_format($n->uts, 1) }}</td>
-                                        <td class="text-center font-14 text-dark">{{ number_format($n->uas, 1) }}</td>
-                                        <td class="text-center">
-                                            <span class="badge bg-soft-blue text-blue font-13 px-2 py-1 rounded" style="background-color: rgba(91, 109, 240, 0.15) !important; color: #5b6df0 !important; font-size: 13px !important; font-weight: 600;">
-                                                {{ number_format($n->nilai_akhir, 1) }}
-                                            </span>
-                                        </td>
-                                        <td class="text-center fw-semibold font-14" style="color: #5b6df0 !important;">
-                                            {{ $n->predikat }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Academic Summary Footer -->
