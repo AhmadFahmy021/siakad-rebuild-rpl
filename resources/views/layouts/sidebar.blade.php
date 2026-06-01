@@ -169,6 +169,30 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
+                <li class="menu-item {{ Request::is('siswa/tugas') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/tugas') }}" class="menu-link {{ Request::is('siswa/tugas') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="check-square"></i>
+                        </span>
+                        <span class="menu-text">Tugas</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('siswa/konsultasi') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/konsultasi') }}" class="menu-link {{ Request::is('siswa/konsultasi') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="mail"></i>
+                        </span>
+                        <span class="menu-text">Konsultasi</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('siswa/nilai') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/nilai') }}" class="menu-link {{ Request::is('siswa/nilai') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="star"></i>
+                        </span>
+                        <span class="menu-text">Nilai</span>
+                    </a>
+                </li>
 
             @endif
 
