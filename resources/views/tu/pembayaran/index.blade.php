@@ -67,9 +67,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('admin/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                        <a href="{{ url('tu/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
                                         {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
-                                        <a href="{{ url('admin/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
+                                        <a href="{{ url('tu/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
                                             disabled
                                         @endif" data-confirm-delete="true">Delete</a>
                                     </td>
@@ -90,7 +90,7 @@
                     <h4 class="modal-title" id="add-pembayaran-modalLabel">Add Pembayaran</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('admin/pembayaran') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ url('tu/pembayaran') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="form-group mb-3">

@@ -202,10 +202,27 @@
 
                 <li class="menu-item {{ Request::is('tu/dashboard') ? 'menuitem-active' : '' }}">
                     <a href="{{ url('tu/dashboard') }}" class="menu-link {{ Request::is('tu/dashboard') ? 'active' : '' }}">
-                        <span class="menu-icon">
-                            <i data-feather="airplay"></i>
-                        </span>
-                        <span class="menu-text">Dashboard TU</span>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/pembayaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/pembayaran') }}" class="menu-link {{ Request::is('tu/pembayaran') ? 'active' : '' }}">
+                        <span class="menu-text">Pembayaran</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/kelas/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/kelas') }}" class="menu-link {{ Request::is('tu/kelas') ? 'active' : '' }}">
+                        <span class="menu-text">Kelas</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/matapelajaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/matapelajaran') }}" class="menu-link {{ Request::is('tu/matapelajaran') ? 'active' : '' }}">
+                        <span class="menu-text">Mata Pelajaran</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/jadwal/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/jadwal') }}" class="menu-link {{ Request::is('tu/jadwal') ? 'active' : '' }}">
+                        <span class="menu-text">Jadwal</span>
                     </a>
                 </li>
 

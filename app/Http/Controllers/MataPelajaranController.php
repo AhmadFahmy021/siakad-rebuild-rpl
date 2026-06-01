@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class MataPelajaranController extends Controller
 {
@@ -12,7 +13,9 @@ class MataPelajaranController extends Controller
      */
     public function index()
     {
-        //
+        $matapelajaran = MataPelajaran::all();
+        confirmDelete("Delete Mata Pelajaran!","Apakah Anda yakin ingin menghapus mata pelajaran ini?");
+        return view('tu.matapelajaran.index', compact('matapelajaran'));
     }
 
     /**
@@ -28,7 +31,16 @@ class MataPelajaranController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        MataPelajaran::create([
+            'nama' => $request->name,
+        ]);
+
+        Alert::success('Success', 'Mata Pelajaran created successfully');
+        return redirect('/tu/matapelajaran');
     }
 
     /**
@@ -44,7 +56,7 @@ class MataPelajaranController extends Controller
      */
     public function edit(MataPelajaran $mataPelajaran)
     {
-        //
+        return view('tu.matapelajaran.edit', compact('mataPelajaran'));
     }
 
     /**
@@ -52,7 +64,17 @@ class MataPelajaranController extends Controller
      */
     public function update(Request $request, MataPelajaran $mataPelajaran)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $req = [
+            'name' => $request->name,
+        ];
+
+        $mataPelajaran->update($req);
+        Alert::success('Berhasil', 'Mata Pelajaran berhasil diperbarui.');
+        return redirect('/tu/matapelajaran');
     }
 
     /**
@@ -60,6 +82,8 @@ class MataPelajaranController extends Controller
      */
     public function destroy(MataPelajaran $mataPelajaran)
     {
-        //
+        $mataPelajaran->delete();
+        Alert::success('Berhasil', 'Mata Pelajaran berhasil dihapus.');
+        return redirect('/tu/matapelajaran');
     }
 }

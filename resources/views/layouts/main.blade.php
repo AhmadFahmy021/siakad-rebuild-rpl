@@ -132,8 +132,53 @@
 
         <!-- Sweet alert init js-->
         <script src="{{ asset('assets') }}/js/pages/sweet-alerts.init.js"></script> --}}
+        <script>
+            document.addEventListener('click', function(event) {
 
-         {{-- @include('sweetalert::alert') --}}
+                var target = event.target;
+                var confirmDeleteElement = target.closest('[data-confirm-delete2]');
+
+                if (confirmDeleteElement) {
+
+                    event.preventDefault();
+
+                    let nama = confirmDeleteElement.dataset.name;
+
+                    Swal.fire({
+                        title: 'Hapus Data?',
+                        text: 'Apakah yakin ingin menghapus "' + nama + '" ?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then(function(result) {
+
+                        if (result.isConfirmed) {
+
+                            var form = document.createElement('form');
+
+                            form.action = confirmDeleteElement.href;
+
+                            form.method = 'POST';
+
+                            form.innerHTML = `
+                                @csrf
+                                @method('DELETE')
+                            `;
+
+                            document.body.appendChild(form);
+
+                            form.submit();
+                        }
+
+                    });
+
+                }
+
+            });
+        </script>
+
+         @include('sweetalert::alert')
          @yield('js')
     </body>
 </html>
