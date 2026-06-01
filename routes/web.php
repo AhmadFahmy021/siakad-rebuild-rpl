@@ -5,9 +5,12 @@ use App\Http\Controllers\BankController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\KelasController;
 use App\Http\Controllers\TugasController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\KonsultasiController;
+use App\Http\Controllers\MataPelajaranController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TagihanController;
@@ -55,5 +58,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('tu')->middleware(['check.tu'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexTataUsaha'])->name('dashboard.tu');
+        Route::resource('/kelas', KelasController::class) ->parameters(['kelas' => 'kelas']);
+        Route::resource('/pembayaran', PembayaranController::class);
+        Route::resource('/matapelajaran', MataPelajaranController::class)->parameters(['matapelajaran' => 'mataPelajaran']);
+        Route::resource('/jadwal', JadwalController::class)->parameters(['jadwal' => 'jadwal']);
     });
 });

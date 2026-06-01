@@ -23,7 +23,8 @@ class PembayaranController extends Controller
         $kelas = Kelas::all();
         // $tagihan = Tagihan::with('kelas')->get();
         confirmDelete("Delete Pembayaran!","Apakah Anda yakin ingin menghapus pembayaran ini?");
-        return view('admin.pembayaran.index', compact('pembayarans', 'siswa', 'kelas'));
+        $role = request()->segment(1);
+        return view("$role.pembayaran.index", compact('pembayarans', 'siswa', 'kelas'));
     }
 
     /**
@@ -80,7 +81,7 @@ class PembayaranController extends Controller
 
         Pembayaran::create($req);
         Alert::success('Berhasil', 'Pembayaran berhasil ditambahkan.');
-        return redirect()->route('pembayaran.index')->with('success', 'Pembayaran berhasil ditambahkan.');
+        return redirect()->back();
     }
 
     /**
@@ -99,7 +100,8 @@ class PembayaranController extends Controller
         $siswa = Siswa::with('user')->get();
         $kelas = Kelas::all();
         $tagihan = Tagihan::with('kelas')->get();
-        return view('admin.pembayaran.edit', compact('pembayaran', 'siswa', 'kelas', 'tagihan'));
+        $role = request()->segment(1);
+        return view("$role.pembayaran.edit", compact('pembayaran', 'siswa', 'kelas', 'tagihan'));
     }
 
     /**
@@ -151,7 +153,8 @@ class PembayaranController extends Controller
 
         $pembayaran->update($req);
         Alert::success('Berhasil', 'Pembayaran berhasil diperbarui.');
-        return redirect('admin/pembayaran');
+        $role = request()->segment(1);
+        return redirect("$role/pembayaran");
     }
 
     /**
@@ -165,7 +168,8 @@ class PembayaranController extends Controller
         }
         $pembayaran->delete();
         Alert::success('Berhasil', 'Pembayaran berhasil dihapus.');
-        return redirect('admin/pembayaran');
+        $role = request()->segment(1);
+        return redirect("$role/pembayaran");
     }
 
 

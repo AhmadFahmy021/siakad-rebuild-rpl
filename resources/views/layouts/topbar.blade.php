@@ -48,8 +48,10 @@
                         <i class="fe-mail"></i>
                         <span>{{ Auth::user()->email }}</span>
                     </span>
-
                     <div class="dropdown-divider"></div>
+                    
+                    <div class="dropdown-title">Role</div>
+
                         @if (App\Models\Admin::where('user_id', Auth::id())->exists())
                             <a href="{{ url('admin/dashboard') }}"
                             class="dropdown-item notify-item {{ Request::is('admin/*') ? 'active' : '' }}">
