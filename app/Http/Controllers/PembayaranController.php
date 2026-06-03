@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bank;
 use App\Models\Kelas;
 use App\Models\Pembayaran;
 use App\Models\Siswa;
@@ -18,6 +19,7 @@ class PembayaranController extends Controller
      */
     public function index()
     {
+
         $pembayarans = Pembayaran::with('tagihan', 'siswa', 'kelas')->get();
         $siswa = Siswa::with('user')->get();
         $kelas = Kelas::all();
@@ -187,5 +189,100 @@ class PembayaranController extends Controller
                         ->orWhereNull('kelas_id')
                         ->get();
         return response()->json($tagihans);
+    }
+
+
+    // ================================ ORTU ====================================
+    public function indexOrtu()
+    {
+            $siswaId = session('siswa_id');
+
+            $siswaKelas = SiswaKelas::where('siswa_id', $siswaId)->with('kelas')->first();
+            $tagihanLunas = Pembayaran::where('siswa_id', $siswaId)->where('status', 'approved')->pluck('tagihan_id');
+            $tagihan = Tagihan::where(function ($query) use ($siswaKelas) {
+                            $query->where('kelas_id', $siswaKelas->kelas_id)
+                                ->orWhereNull('kelas_id');
+                        })
+                        ->whereNotIn('id', $tagihanLunas)
+                        ->with('kelas')
+                        ->get();
+            $pembayaran = Pembayaran::where('siswa_id', $siswaId)->get()->keyBy('tagihan_id');
+            return view("ortu.pembayaran.index", compact('tagihan', 'pembayaran'));
+    }
+
+    public function bayar($tagihan)
+    {
+        $tagihan = Tagihan::findOrFail($tagihan);
+        $siswaId = session('siswa_id');
+        $siswaKelas = SiswaKelas::where('siswa_id', $siswaId)->with('kelas')->first();
+        $bank = Bank::all();
+        $pembayaran = Pembayaran::where('siswa_id', $siswaId)->where('tagihan_id', $tagihan->id)->first();
+        return view("ortu.pembayaran.bayar", compact('tagihan', 'siswaKelas', 'bank', 'pembayaran'));
+    }
+
+    public function bayarStore(Request $request, $tagihan)
+    {
+        $siswaId = session('siswa_id');
+        $siswaKelas = SiswaKelas::where('siswa_id', $siswaId)->with('kelas')->first();
+
+        $date = now()->format('Y-m-d H:i:s');
+        $pembayaran = Pembayaran::where('siswa_id', $siswaId)->where('tagihan_id', $tagihan)->first();
+        if ($pembayaran) {
+            $request->validate([
+                'nominal' => 'required|integer|min:0',
+                'bukti_pembayaran' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+                'semester' => 'required|string|max:20',
+                'bank' => 'required|exists:banks,id',
+            ]);
+
+            $buktiPembayaran = $pembayaran->bukti_pembayaran;
+
+            if ($request->hasFile('bukti_pembayaran')) {
+                if ($pembayaran->bukti_pembayaran && Storage::disk('public')->exists($pembayaran->bukti_pembayaran) ) {
+                    Storage::disk('public')
+                        ->delete($pembayaran->bukti_pembayaran);
+                }
+
+                $buktiPembayaran = $request
+                    ->file('bukti_pembayaran')
+                    ->store('bukti-pembayaran', 'public');
+            }
+
+            $pembayaran->update([
+                'nominal' => $request->nominal,
+                'tanggal' => $date,
+                'semester' => $request->semester,
+                'status' => 'pending',
+                'bukti_pembayaran' => $buktiPembayaran,
+                'bank_id' => $request->bank,
+            ]);
+            Alert::success('Berhasil', 'Pembayaran berhasil diajukan.');
+            return redirect('ortu/pembayaran');
+        }
+        $request->validate([
+            'nominal' => 'required|integer|min:0',
+            'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'semester' => 'required|string|max:20',
+            'bank' => 'required|exists:banks,id',
+        ]);
+
+        $buktiPembayaran = $request
+            ->file('bukti_pembayaran')
+            ->store('bukti-pembayaran', 'public');
+
+        Pembayaran::create([
+            'kelas_id' => $siswaKelas->kelas_id,
+            'siswa_id' => $siswaId,
+            'tagihan_id' => $tagihan,
+            'nominal' => $request->nominal,
+            'tanggal' => $date,
+            'semester' => $request->semester,
+            'status' => 'pending',
+            'bukti_pembayaran' => $buktiPembayaran,
+            'bank_id' => $request->bank,
+        ]);
+
+        Alert::success('Berhasil', 'Pembayaran berhasil diajukan.');
+        return redirect('ortu/pembayaran');
     }
 }

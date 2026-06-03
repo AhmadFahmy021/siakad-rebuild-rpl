@@ -210,6 +210,25 @@
                         <span class="menu-text">Pembayaran</span>
                     </a>
                 </li>
+                {{-- <li class="menu-item">
+                    <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
+                        <span class="menu-text"> Kelas </span>
+                    </a>
+                    <div class="collapse" id="menuDashboards">
+                        <ul class="sub-menu">
+                            <li class="menu-item">
+                                <a href="index.html" class="menu-link">
+                                    <span class="menu-text">Kelola Kelas</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="dashboard-2.html" class="menu-link">
+                                    <span class="menu-text"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li> --}}
                 <li class="menu-item {{ Request::is('tu/kelas/*') ? 'menuitem-active' : '' }}">
                     <a href="{{ url('tu/kelas') }}" class="menu-link {{ Request::is('tu/kelas') ? 'active' : '' }}">
                         <span class="menu-text">Kelas</span>
@@ -222,6 +241,25 @@
                 </li>
                 <li class="menu-item {{ Request::is('tu/jadwal/*') ? 'menuitem-active' : '' }}">
                     <a href="{{ url('tu/jadwal') }}" class="menu-link {{ Request::is('tu/jadwal') ? 'active' : '' }}">
+                        <span class="menu-text">Jadwal</span>
+                    </a>
+                </li>
+
+            @endif
+            @if(Request::is('ortu/*'))
+
+                <li class="menu-item {{ Request::is('ortu/dashboard') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/dashboard') }}" class="menu-link {{ Request::is('ortu/dashboard') ? 'active' : '' }}">
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('ortu/pembayaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/pembayaran') }}" class="menu-link {{ Request::is('ortu/pembayaran') ? 'active' : '' }}">
+                        <span class="menu-text">Pembayaran</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('ortu/jadwal/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/jadwal') }}" class="menu-link {{ Request::is('ortu/jadwal') ? 'active' : '' }}">
                         <span class="menu-text">Jadwal</span>
                     </a>
                 </li>

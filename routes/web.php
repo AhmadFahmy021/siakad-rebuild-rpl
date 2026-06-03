@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthOrtuController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
@@ -25,8 +26,25 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('ortu/login', [AuthOrtuController::class, 'index']);
+Route::post('ortu/login', [AuthOrtuController::class, 'login']);
+
+Route::middleware(['check.orangtua'])->prefix('ortu')->group(function () {
+    Route::get('logout', [AuthOrtuController::class, 'logout']);
+    Route::get('/dashboard', function () {
+        return view('ortu.index');
+    });
+    Route::prefix('pembayaran')->group(function () {
+        Route::get('/', [PembayaranController::class, 'indexOrtu']);
+        Route::get('/{tagihan}/bayar', [PembayaranController::class, 'bayar']);
+        Route::post('/{tagihan}', [PembayaranController::class, 'bayarStore']);
+    });
+    Route::get('jadwal', [JadwalController::class, 'indexOrtu']);
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->middleware(['check.admin'])->group(function () {
+
         Route::get('/dashboard', [DashboardController::class, 'indexAdmin'])->name('dashboard.admin');
 
         Route::prefix('/kelola')->group(function () {
@@ -58,7 +76,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('tu')->middleware(['check.tu'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexTataUsaha'])->name('dashboard.tu');
+
         Route::resource('/kelas', KelasController::class) ->parameters(['kelas' => 'kelas']);
+        Route::get('/kelas/{kelas}/kelola', [KelasController::class, 'kelola']);
         Route::resource('/pembayaran', PembayaranController::class);
         Route::resource('/matapelajaran', MataPelajaranController::class)->parameters(['matapelajaran' => 'mataPelajaran']);
         Route::resource('/jadwal', JadwalController::class)->parameters(['jadwal' => 'jadwal']);

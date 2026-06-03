@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\SiswaKelas;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -91,5 +93,11 @@ class KelasController extends Controller
         $kelas->delete();
         Alert::success('Success', 'Kelas deleted successfully');
         return redirect('/tu/kelas');
+    }
+
+    public function kelola(Kelas $kelas) {
+        $siswaKelas = SiswaKelas::with('siswa.user')->where('kelas_id', $kelas->id)->get()->pluck('siswa_id');
+        $siswa = Siswa::with('user')->whereNotIn('id', $siswaKelas)->get();
+        return view('tu.kelas.kelola', compact('kelas', 'siswa', 'siswaKelas'));
     }
 }

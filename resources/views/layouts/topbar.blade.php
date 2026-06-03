@@ -28,9 +28,16 @@
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <img src="{{ asset('assets') }}/images/users/user-1.jpg" alt="user-image" class="rounded-circle">
-                    <span class="ms-1 d-none d-md-inline-block">
-                        {{ Auth::user()->name }} <i class="mdi mdi-chevron-down"></i>
-                    </span>
+                    @auth
+                        <span class="ms-1 d-none d-md-inline-block">
+                            {{ Auth::user()->name }} <i class="mdi mdi-chevron-down"></i>
+                        </span>
+                    @endauth
+                    @if (session('nama_ortu'))
+                        <span class="ms-1 d-none d-md-inline-block text-capitalize">
+                            {{ session('nama_ortu')}} <i class="mdi mdi-chevron-down"></i>
+                        </span>
+                    @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
                     <!-- item-->
@@ -41,15 +48,21 @@
                     <!-- item-->
                     <span class="dropdown-item notify-item">
                         <i class="fe-user"></i>
-                        <span>{{ Auth::user()->username }}</span>
+                        @auth
+                            <span >{{ Auth::user()->username }}</span>
+                        @endauth
+                        <span class="text-capitalize">{{ session('siswa_nama') }}</span>
                     </span>
 
                     <span class="dropdown-item notify-item">
                         <i class="fe-mail"></i>
-                        <span>{{ Auth::user()->email }}</span>
+                        <span>{{ Auth::user()->email ?? 'N/A' }}</span>
                     </span>
                     <div class="dropdown-divider"></div>
-                    
+
+                    {{-- if --}}
+                    @auth
+
                     <div class="dropdown-title">Role</div>
 
                         @if (App\Models\Admin::where('user_id', Auth::id())->exists())
@@ -79,16 +92,22 @@
                                 <span>Siswa</span>
                             </a>
                         @endif
-                    <div class="dropdown-divider"></div>
-
-                    <!-- item-->
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="dropdown-item notify-item">
+                        <div class="dropdown-divider"></div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-item notify-item">
+                                <i class="fe-log-out"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    @endauth
+                    @if (session('ortu_login'))
+                        <a href="{{ url('ortu/logout') }}" class="dropdown-item notify-item">
                             <i class="fe-log-out"></i>
-                            <span>Logout</span>
-                        </button>
-                    </form>
+                                <span>Logout</span>
+                        </a>
+                    @endif
+                    <!-- item-->
 
                 </div>
             </li>

@@ -39,7 +39,23 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user' => 'required|exists:users,id',
+            'orang_tua' => 'required|string|max:255',
+        ]);
+
+        $user = User::where('id', $request->user)->first();
+        if (!$user) {
+            return back()->withErrors(['user' => 'User tidak ditemukan.'])->withInput();
+        }
+
+        Siswa::create([
+            'user_id' => $user->id,
+            'nama_ortu' => $request->orang_tua,
+        ]);
+
+        Alert::success('Berhasil', 'Data siswa ' . strtoupper($user->name) . ' berhasil ditambahkan.');
+        return redirect()->route('siswa.index');
     }
 
     /**
