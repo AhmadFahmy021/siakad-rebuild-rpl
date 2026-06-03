@@ -42,7 +42,7 @@
                                     <td>{{ $item->guru->user->name }}</td>
                                     <td>
                                         <a href="{{ url('tu/kelas/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                        {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
+                                        <a href="{{ url('tu/kelas/' . $item->id . '/kelola') }}" class="btn btn-outline-success btn-sm">Kelola</a>
                                         <a href="{{ url('tu/kelas/' . $item->id) }}" class="btn btn-outline-danger btn-sm" data-confirm-delete2="true" data-name="{{ $item->name }}">Delete</a>
                                     </td>
                                 </tr>

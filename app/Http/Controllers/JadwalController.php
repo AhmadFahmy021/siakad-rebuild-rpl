@@ -6,6 +6,7 @@ use App\Models\Guru;
 use App\Models\Jadwal;
 use App\Models\Kelas;
 use App\Models\MataPelajaran;
+use App\Models\SiswaKelas;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -114,5 +115,12 @@ class JadwalController extends Controller
         $jadwal->delete();
         Alert::success('Berhasil', 'Jadwal berhasil dihapus.');
         return redirect('/tu/jadwal');
+    }
+
+    public function indexOrtu() {
+        $siswaId = session('siswa_id');
+        $siswaKelas = SiswaKelas::where('siswa_id', $siswaId)->with('kelas')->first();
+        $jadwal = Jadwal::where('kelas_id', $siswaKelas->kelas->id)->with(['kelas', 'matapelajaran', 'guru'])->get();
+        return view('ortu.jadwal.index', compact('jadwal'));
     }
 }
