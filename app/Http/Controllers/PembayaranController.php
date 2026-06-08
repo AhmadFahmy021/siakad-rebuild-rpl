@@ -191,6 +191,14 @@ class PembayaranController extends Controller
         return response()->json($tagihans);
     }
 
+    public function getTagihanByTagihanId(string $tagihanId)
+    {
+
+        $tagihans = Tagihan::where('id', $tagihanId)->get();
+        // dd($tagihans);
+        return response()->json($tagihans);
+    }
+
 
     // ================================ ORTU ====================================
     public function indexOrtu()

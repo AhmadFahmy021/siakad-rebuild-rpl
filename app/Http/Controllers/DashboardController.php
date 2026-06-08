@@ -10,8 +10,12 @@ use App\Models\Tugas;
 use App\Models\PengumpulanTugas;
 use App\Models\Nilai;
 use App\Models\Jadwal;
+use App\Models\Pembayaran;
+use App\Models\Tagihan;
+use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -20,7 +24,52 @@ class DashboardController extends Controller
     }
 
     public function indexAdmin()  {
-        return view('admin.dashboard');
+        // Total Uang Tagihan dan yang sudah dibayarkan
+        $totalTagihanUang = Tagihan::sum('nominal');
+        $totalPembayaranSudah = Pembayaran::where('status', 'approved')->sum('nominal');
+        $totalPembayaranBelum = $totalTagihanUang - $totalPembayaranSudah;
+
+        // Pertumbuhan Guru dan Siswa (12 bulan terakhir)
+        $guruData = [];
+        $siswaData = [];
+        $months = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $month = $date->format('M'); // Format bulan: Jan, Feb, etc
+            $months[] = $month;
+
+            // Count guru created in this month
+            $guruData[] = Guru::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+
+            // Count siswa created in this month
+            $siswaData[] = Siswa::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+        }
+
+        // Jumlah Total Tagihan yang sudah dibayarkan dari siswa per kelas/kategori
+        $tagihanBayarPerKategori = Pembayaran::where('status', 'approved')
+            ->with('tagihan')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->tagihan->category ?? 'Lainnya';
+            })
+            ->map(function($items) {
+                return $items->sum('nominal');
+            });
+
+        return view('admin.dashboard', compact(
+            'totalTagihanUang',
+            'totalPembayaranSudah',
+            'totalPembayaranBelum',
+            'months',
+            'guruData',
+            'siswaData',
+            'tagihanBayarPerKategori'
+        ));
     }
 
     public function indexGuru()  {
@@ -44,13 +93,13 @@ class DashboardController extends Controller
 
         // 2. Calculate Tugas Stats
         $totalTugas = $kelasId ? Tugas::where('kelas_id', $kelasId)->count() : 0;
-        
+
         $selesaiTugas = PengumpulanTugas::where('siswa_id', $siswa->id)
             ->where(function ($query) {
                 $query->where('status', 'sudah_mengumpulkan')
                       ->orWhere('status', 'dinilai');
             })->count();
-            
+
         $aktifTugas = max(0, $totalTugas - $selesaiTugas);
 
         // Calculate tasks approaching deadline (< 24 hours remaining)
@@ -141,6 +190,52 @@ class DashboardController extends Controller
     }
 
     public function indexTataUsaha()  {
-        return view('tu.index');
+        // Jumlah Tagihan dan Total Uang yang sudah masuk
+        $jumlahTagihan = Tagihan::count();
+        $totalUangMasuk = Pembayaran::where('status', 'approve')->sum('nominal');
+        $pembayaranPending = Pembayaran::where('status', 'pending')->count();
+        $pembayaranApprove = Pembayaran::where('status', 'approved')->count();
+
+        // Data pertumbuhan pembayaran (12 bulan terakhir)
+        $pembayaranData = [];
+        $months = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $month = $date->format('M'); // Format bulan: Jan, Feb, etc
+            $months[] = $month;
+
+            // Sum pembayaran yang sudah approve di bulan ini
+            $pembayaranData[] = Pembayaran::where('status', 'approved')
+                ->whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->sum('nominal');
+        }
+
+        // Semua Kelas dengan status pembayaran approve/pending
+        $kelas = \App\Models\Kelas::all();
+
+        $kelasStats = $kelas->map(function($k) {
+            $totalPending = Pembayaran::where('kelas_id', $k->id)->where('status', 'pending')->count();
+            $totalApprove = Pembayaran::where('kelas_id', $k->id)->where('status', 'approved')->count();
+
+            return [
+                'id' => $k->id,
+                'nama' => $k->name,
+                'pending' => $totalPending,
+                'approve' => $totalApprove
+            ];
+        });
+
+        return view('tu.index', compact(
+            'jumlahTagihan',
+            'totalUangMasuk',
+            'pembayaranPending',
+            'pembayaranApprove',
+            'months',
+            'pembayaranData',
+            'kelas',
+            'kelasStats'
+        ));
     }
 }
