@@ -8,6 +8,7 @@
         </div>
     </div>
 
+    <!-- KPI Cards Row 1 -->
     <div class="row">
         <div class="col-md-6 col-xl-3">
             <div class="widget-rounded-circle card">
@@ -60,7 +61,7 @@
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $pembayaranPending }}</span></h3>
+                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ Pembayaran::where('status', 'pending')->count() }}</span></h3>
                                 <p class="text-muted mb-1 text-truncate">Pembayaran Pending</p>
                             </div>
                         </div>
@@ -75,13 +76,13 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="avatar-lg rounded-circle bg-soft-warning border-warning border">
-                                <i class="fe-home font-22 avatar-title text-warning"></i>
+                                <i class="fe-book font-22 avatar-title text-warning"></i>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $kelas->count() }}</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Total Kelas</p>
+                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $mataPelajaran->count() }}</span></h3>
+                                <p class="text-muted mb-1 text-truncate">Total Mata Pelajaran</p>
                             </div>
                         </div>
                     </div>
@@ -90,13 +91,14 @@
         </div>
     </div>
 
+    <!-- Charts Row -->
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title mb-3">Pertumbuhan Hasil Pembayaran (12 Bulan Terakhir)</h4>
                     <div dir="ltr">
-                        <div id="payment-growth-chart" class="mt-4" style="height: 350px;"></div>
+                        <div id="payment-growth-chart" class="mt-4" style="height: 350px;" data-colors="#1abc9c"></div>
                     </div>
                 </div>
             </div>
@@ -106,38 +108,49 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title mb-3">Ringkasan Status Pembayaran</h4>
-                    <div id="payment-status-chart" class="mt-4" style="height: 250px;"></div>
+                    <div id="payment-status-chart" class="mt-4" style="height: 250px;" data-colors="#1abc9c,#f1556c"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Mata Pelajaran Table -->
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title mb-3">Daftar Kelas - Status Pembayaran</h4>
+                    <h4 class="header-title mb-3">Daftar Mata Pelajaran - Status Pembayaran</h4>
                     <div class="table-responsive">
                         <table class="table table-borderless table-hover table-nowrap m-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Nama Kelas</th>
+                                    <th>Nama Mata Pelajaran</th>
                                     <th class="text-center">Pending</th>
                                     <th class="text-center">Sudah Di-Approve</th>
                                     <th class="text-center">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($kelasStats as $k)
+                                @forelse($mataPelajaranStats as $mp)
                                     <tr>
-                                        <td><h5 class="m-0 fw-normal">{{ $k['nama'] }}</h5></td>
-                                        <td class="text-center"><span class="badge bg-warning text-dark">{{ $k['pending'] }}</span></td>
-                                        <td class="text-center"><span class="badge bg-success">{{ $k['approve'] }}</span></td>
-                                        <td class="text-center"><strong>{{ $k['pending'] + $k['approve'] }}</strong></td>
+                                        <td>
+                                            <h5 class="m-0 fw-normal">{{ $mp['nama'] }}</h5>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning text-dark">{{ $mp['pending'] }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success">{{ $mp['approve'] }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <strong>{{ $mp['pending'] + $mp['approve'] }}</strong>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-3">Tidak ada data kelas</td>
+                                        <td colspan="4" class="text-center text-muted py-3">
+                                            Tidak ada data mata pelajaran
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -150,80 +163,84 @@
 
 @endsection
 
-@section('js')
+@push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest/dist/apexcharts.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Growth Chart (ApexCharts) - use json_encode to avoid HTML entity escaping
-            var paymentGrowthOptions = {
-                chart: { type: 'area', toolbar: { show: false } },
-                series: [{ name: 'Pembayaran (Rp)', data: {!! json_encode($pembayaranData) !!} }],
-                xaxis: { categories: {!! json_encode($months) !!} },
-                colors: ['#1abc9c'],
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.45,
-                        opacityTo: 0.05,
-                        stops: [20, 100, 100, 100]
-                    }
-                },
-                dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 2 },
-                tooltip: {
-                    y: {
-                        formatter: function(val) {
-                            return 'Rp. ' + val.toLocaleString('id-ID');
-                        }
+        // Pertumbuhan Pembayaran Chart
+        var paymentGrowthOptions = {
+            chart: {
+                type: 'area',
+                toolbar: { show: false },
+                sparkline: { enabled: false }
+            },
+            series: [{
+                name: 'Pembayaran (Rp)',
+                data: {!! json_encode($pembayaranData) !!}
+            }],
+            xaxis: {
+                categories: {!! json_encode($months) !!}
+            },
+            colors: ['#1abc9c'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.45,
+                    opacityTo: 0.05,
+                    stops: [20, 100, 100, 100]
+                }
+            },
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 2 }
+        };
+        var paymentGrowthChart = new ApexCharts(document.querySelector("#payment-growth-chart"), paymentGrowthOptions);
+        paymentGrowthChart.render();
+
+        // Status Pembayaran Chart (Donut)
+        var pendingCount = {{ $pembayaranPending }};
+        var approveCount = {{ $pembayaranApprove }};
+
+        var paymentStatusOptions = {
+            chart: { type: 'donut' },
+            series: [pendingCount, approveCount],
+            labels: ['Pending', 'Sudah Di-Approve'],
+            colors: ['#f1556c', '#1abc9c'],
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '75%'
                     }
                 }
-            };
-            new ApexCharts(document.querySelector("#payment-growth-chart"), paymentGrowthOptions).render();
+            },
+            dataLabels: { enabled: true }
+        };
+        var paymentStatusChart = new ApexCharts(document.querySelector("#payment-status-chart"), paymentStatusOptions);
+        paymentStatusChart.render();
 
-            // Status Donut Chart (ApexCharts)
-            var pendingCount = {{ $pembayaranPending }};
-            var approveCount = {{ $pembayaranApprove }};
-            var paymentStatusOptions = {
-                chart: { type: 'donut' },
-                series: [pendingCount, approveCount],
-                labels: ['Pending', 'Sudah Di-Approve'],
-                colors: ['#f1556c', '#1abc9c'],
-                plotOptions: {
-                    pie: {
-                        donut: { size: '70%' }
-                    }
-                },
-                legend: { position: 'bottom' },
-                dataLabels: { enabled: pendingCount + approveCount > 0 }
-            };
-            new ApexCharts(document.querySelector("#payment-status-chart"), paymentStatusOptions).render();
+        // Counter animation
+        $('[data-plugin="counterup"]').each(function() {
+            var $this = $(this),
+                from = parseInt($this.attr('data-from'), 10) || 0,
+                to = parseInt($this.text(), 10),
+                speed = 2000,
+                refreshInterval = 100,
+                increase = (to - from) / (speed / refreshInterval);
 
-            // Counter animation formatting to Indonesian format (with dots)
-            $('[data-plugin="counterup"]').each(function() {
-                var $this = $(this),
-                    from = parseInt($this.attr('data-from'), 10) || 0,
-                    to = parseInt($this.text(), 10),
-                    speed = 1500,
-                    refreshInterval = 50,
-                    increase = (to - from) / (speed / refreshInterval);
+            var loopCount = 0,
+                checkMax = speed / refreshInterval,
+                current = from;
 
-                var loopCount = 0,
-                    checkMax = speed / refreshInterval,
-                    current = from;
-
-                var interval = setInterval(function() {
-                    current += increase;
-                    loopCount++;
-                    if (loopCount >= checkMax) {
-                        current = to;
-                    }
-                    $this.text(Math.floor(current).toLocaleString('id-ID'));
-                    if (loopCount >= checkMax) {
-                        clearInterval(interval);
-                    }
-                }, refreshInterval);
-            });
+            var interval = setInterval(function() {
+                current += increase;
+                loopCount++;
+                if (loopCount >= checkMax) {
+                    current = to;
+                }
+                $this.text(Math.floor(current).toLocaleString());
+                if (loopCount >= checkMax) {
+                    clearInterval(interval);
+                }
+            }, refreshInterval);
         });
     </script>
-@endsection
+@endpush
