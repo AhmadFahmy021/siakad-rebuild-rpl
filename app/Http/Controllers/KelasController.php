@@ -96,8 +96,38 @@ class KelasController extends Controller
     }
 
     public function kelola(Kelas $kelas) {
-        $siswaKelas = SiswaKelas::with('siswa.user')->where('kelas_id', $kelas->id)->get()->pluck('siswa_id');
-        $siswa = Siswa::with('user')->whereNotIn('id', $siswaKelas)->get();
+        $siswaDiKelasLain = SiswaKelas::where('kelas_id', '!=', $kelas->id)->pluck('siswa_id')->toArray();
+        $siswa = Siswa::with('user')->whereNotIn('id', $siswaDiKelasLain)->get();
+        $siswaKelas = SiswaKelas::where('kelas_id', $kelas->id)->pluck('siswa_id')->toArray();
+
         return view('tu.kelas.kelola', compact('kelas', 'siswa', 'siswaKelas'));
+    }
+
+    public function kelolaStore(Request $request, Kelas $kelas)
+    {
+        $request->validate([
+            'siswa' => 'nullable|array',
+            'siswa.*' => 'exists:siswa,id',
+        ]);
+
+        $currentSiswaIds = SiswaKelas::where('kelas_id', $kelas->id)->pluck('siswa_id')->toArray();
+        $newSiswaIds = $request->input('siswa', []);
+
+        $toAdd = array_diff($newSiswaIds, $currentSiswaIds);
+        $toRemove = array_diff($currentSiswaIds, $newSiswaIds);
+
+        if (!empty($toRemove)) {
+            SiswaKelas::where('kelas_id', $kelas->id)->whereIn('siswa_id', $toRemove)->delete();
+        }
+
+        foreach ($toAdd as $siswaId) {
+            SiswaKelas::create([
+                'kelas_id' => $kelas->id,
+                'siswa_id' => $siswaId,
+            ]);
+        }
+
+        Alert::success('Success', 'Pendaftaran siswa berhasil disimpan.');
+        return redirect("tu/kelas");
     }
 }

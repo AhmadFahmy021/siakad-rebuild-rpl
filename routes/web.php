@@ -31,9 +31,7 @@ Route::post('ortu/login', [AuthOrtuController::class, 'login']);
 
 Route::middleware(['check.orangtua'])->prefix('ortu')->group(function () {
     Route::get('logout', [AuthOrtuController::class, 'logout']);
-    Route::get('/dashboard', function () {
-        return view('ortu.index');
-    });
+    Route::get('/dashboard', [DashboardController::class, 'indexOrtu'])->name('dashboard.ortu');
     Route::prefix('pembayaran')->group(function () {
         Route::get('/', [PembayaranController::class, 'indexOrtu']);
         Route::get('/{tagihan}/bayar', [PembayaranController::class, 'bayar']);
@@ -81,6 +79,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('/kelas', KelasController::class) ->parameters(['kelas' => 'kelas']);
         Route::get('/kelas/{kelas}/kelola', [KelasController::class, 'kelola']);
+        Route::post('/kelas/{kelas}/kelola', [KelasController::class, 'kelolaStore']);
         Route::resource('/pembayaran', PembayaranController::class);
         Route::resource('/matapelajaran', MataPelajaranController::class)->parameters(['matapelajaran' => 'mataPelajaran']);
         Route::resource('/jadwal', JadwalController::class)->parameters(['jadwal' => 'jadwal']);

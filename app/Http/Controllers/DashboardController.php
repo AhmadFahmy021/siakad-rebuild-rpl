@@ -10,6 +10,7 @@ use App\Models\Tugas;
 use App\Models\PengumpulanTugas;
 use App\Models\Nilai;
 use App\Models\Jadwal;
+use App\Models\Kelas;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Models\MataPelajaran;
@@ -120,15 +121,33 @@ class DashboardController extends Controller
             }
         }
 
-        // 3. Weekly Schedule Matrix (Monday to Friday, 3 timeslots)
-        $timeslots = [
-            '07:30:00 - 09:00:00' => '07:30 - 09:00',
-            '09:30:00 - 11:00:00' => '09:30 - 11:00',
-            '11:00:00 - 12:30:00' => '11:00 - 12:30',
-        ];
-
+        // 3. Weekly Schedule Matrix (Monday to Friday)
         $scheduleMatrix = [];
-        foreach ($timeslots as $timeKey => $timeLabel) {
+        $timeslots = [];
+
+        if ($kelasId) {
+            $jadwalRaw = Jadwal::where('kelas_id', $kelasId)
+                ->with('mataPelajaran')
+                ->get();
+
+            // Generate unique timeslots from data
+            foreach ($jadwalRaw as $j) {
+                $timeLabel = substr($j->jam_mulai, 0, 5) . ' - ' . substr($j->jam_selesai, 0, 5);
+                $timeslots[$timeLabel] = $timeLabel;
+            }
+            ksort($timeslots);
+        }
+
+        // Fallback to default slots if empty
+        if (empty($timeslots)) {
+            $timeslots = [
+                '07:30 - 09:00' => '07:30 - 09:00',
+                '09:30 - 11:00' => '09:30 - 11:00',
+                '11:00 - 12:30' => '11:00 - 12:30',
+            ];
+        }
+
+        foreach ($timeslots as $timeLabel) {
             $scheduleMatrix[$timeLabel] = [
                 'Senin' => null,
                 'Selasa' => null,
@@ -138,22 +157,12 @@ class DashboardController extends Controller
             ];
         }
 
-        if ($kelasId) {
-            $jadwalRaw = Jadwal::where('kelas_id', $kelasId)
-                ->with('mataPelajaran')
-                ->get();
-
+        if ($kelasId && isset($jadwalRaw)) {
             foreach ($jadwalRaw as $j) {
                 $day = ucfirst(strtolower($j->hari)); // Senin, Selasa...
-                $start = $j->jam_mulai;
-                $end = $j->jam_selesai;
-
-                foreach ($timeslots as $timeRange => $timeLabel) {
-                    [$tMulai, $tSelesai] = explode(' - ', $timeRange);
-                    if (strtotime($start) >= strtotime($tMulai) && strtotime($end) <= strtotime($tSelesai)) {
-                        $scheduleMatrix[$timeLabel][$day] = $j;
-                        break;
-                    }
+                $timeLabel = substr($j->jam_mulai, 0, 5) . ' - ' . substr($j->jam_selesai, 0, 5);
+                if (isset($scheduleMatrix[$timeLabel])) {
+                    $scheduleMatrix[$timeLabel][$day] = $j;
                 }
             }
         }
@@ -192,7 +201,8 @@ class DashboardController extends Controller
     public function indexTataUsaha()  {
         // Jumlah Tagihan dan Total Uang yang sudah masuk
         $jumlahTagihan = Tagihan::count();
-        $totalUangMasuk = Pembayaran::where('status', 'approve')->sum('nominal');
+        // dd($jumlahTagihan);
+        $totalUangMasuk = Pembayaran::where('status', 'approved')->sum('nominal');
         $pembayaranPending = Pembayaran::where('status', 'pending')->count();
         $pembayaranApprove = Pembayaran::where('status', 'approved')->count();
 
@@ -213,7 +223,10 @@ class DashboardController extends Controller
         }
 
         // Semua Kelas dengan status pembayaran approve/pending
-        $kelas = \App\Models\Kelas::all();
+        $kelas = Kelas::all();
+        // dd($kelas->count());
+        $totalKelas = $kelas->count();
+
 
         $kelasStats = $kelas->map(function($k) {
             $totalPending = Pembayaran::where('kelas_id', $k->id)->where('status', 'pending')->count();
@@ -235,7 +248,125 @@ class DashboardController extends Controller
             'months',
             'pembayaranData',
             'kelas',
-            'kelasStats'
+            'kelasStats',
+            'totalKelas'
+        ));
+    }
+
+    public function indexOrtu()
+    {
+        $siswaId = session('siswa_id');
+        if (!$siswaId) {
+            return redirect('/ortu/login');
+        }
+
+        $siswa = Siswa::with('user')->find($siswaId);
+        if (!$siswa) {
+            session()->flush();
+            return redirect('/ortu/login');
+        }
+
+        $kelas = $siswa->kelas()->first();
+        $kelasId = $kelas ? $kelas->id : null;
+
+        // 1. Calculate unpaid bills (total tagihan belum dibayar)
+        $tagihanLunas = Pembayaran::where('siswa_id', $siswaId)->where('status', 'approved')->pluck('tagihan_id');
+        $tagihanBelumBayar = Tagihan::where(function ($query) use ($kelasId) {
+                if ($kelasId) {
+                    $query->where('kelas_id', $kelasId);
+                }
+                $query->orWhereNull('kelas_id');
+            })
+            ->whereNotIn('id', $tagihanLunas)
+            ->get();
+
+        $totalTagihanBelumBayar = $tagihanBelumBayar->sum('nominal');
+
+        // 2. Approved payments history (riwayat pembayaran yang sudah diapprove)
+        $riwayatPembayaran = Pembayaran::where('siswa_id', $siswaId)
+            ->where('status', 'approved')
+            ->with('tagihan')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        // 3. Weekly schedule matrix (data jadwal anak)
+        $scheduleMatrix = [];
+        $timeslots = [];
+        $totalJadwal = 0;
+        $upcomingJadwal = null;
+
+        if ($kelasId) {
+            $totalJadwal = Jadwal::where('kelas_id', $kelasId)->count();
+            $jadwals = Jadwal::where('kelas_id', $kelasId)->with(['matapelajaran', 'guru.user'])->get();
+
+            // Generate unique timeslots from data
+            foreach ($jadwals as $j) {
+                $timeLabel = substr($j->jam_mulai, 0, 5) . ' - ' . substr($j->jam_selesai, 0, 5);
+                $timeslots[$timeLabel] = $timeLabel;
+            }
+            ksort($timeslots);
+        }
+
+        // Fallback to default slots if empty
+        if (empty($timeslots)) {
+            $timeslots = [
+                '07:30 - 09:00' => '07:30 - 09:00',
+                '09:30 - 11:00' => '09:30 - 11:00',
+                '11:00 - 12:30' => '11:00 - 12:30',
+            ];
+        }
+
+        foreach ($timeslots as $timeLabel) {
+            $scheduleMatrix[$timeLabel] = [
+                'Senin' => null,
+                'Selasa' => null,
+                'Rabu' => null,
+                'Kamis' => null,
+                'Jumat' => null,
+            ];
+        }
+
+        if ($kelasId && isset($jadwals)) {
+            // Populate schedule matrix
+            foreach ($jadwals as $j) {
+                $day = ucfirst(strtolower($j->hari)); // Senin, Selasa...
+                $timeLabel = substr($j->jam_mulai, 0, 5) . ' - ' . substr($j->jam_selesai, 0, 5);
+                if (isset($scheduleMatrix[$timeLabel])) {
+                    $scheduleMatrix[$timeLabel][$day] = $j;
+                }
+            }
+
+            // 4. Closest upcoming schedule from now
+            $now = Carbon::now();
+            $currentDayOfWeek = $now->dayOfWeek; // 0 (Sunday) to 6 (Saturday)
+            $currentTime = $now->format('H:i:s');
+            $daysOrder = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+            $sortedJadwals = $jadwals->sortBy(function ($jadwal) use ($currentDayOfWeek, $currentTime, $daysOrder) {
+                $scheduleDayIndex = array_search(ucfirst(strtolower($jadwal->hari)), $daysOrder);
+                if ($scheduleDayIndex === false) {
+                    $scheduleDayIndex = 1;
+                }
+                $dayDiff = $scheduleDayIndex - $currentDayOfWeek;
+                if ($dayDiff < 0) {
+                    $dayDiff += 7;
+                } elseif ($dayDiff === 0 && strcmp($jadwal->jam_mulai, $currentTime) < 0) {
+                    $dayDiff += 7;
+                }
+                return sprintf('%d_%s', $dayDiff, $jadwal->jam_mulai);
+            });
+
+            $upcomingJadwal = $sortedJadwals->first();
+        }
+
+        return view('ortu.index', compact(
+            'siswa',
+            'kelas',
+            'totalTagihanBelumBayar',
+            'riwayatPembayaran',
+            'totalJadwal',
+            'upcomingJadwal',
+            'scheduleMatrix'
         ));
     }
 }

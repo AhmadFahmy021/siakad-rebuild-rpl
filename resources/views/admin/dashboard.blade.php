@@ -21,7 +21,7 @@
                         <div class="col-6">
                             <div class="text-end">
                                 <p class="text-muted mb-0 font-12">Rp.</p>
-                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-plugin="counterup" data-value="{{ $totalTagihanUang }}">{{ number_format($totalTagihanUang, 0, ',', '.') }}</span></h4>
+                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-counter data-value="{{ $totalTagihanUang }}">{{ number_format($totalTagihanUang, 0, ',', '.') }}</span></h4>
                                 <p class="text-muted mb-1 text-truncate">Total Tagihan</p>
                             </div>
                         </div>
@@ -42,8 +42,8 @@
                         <div class="col-6">
                             <div class="text-end">
                                 <p class="text-muted mb-0 font-12">Rp.</p>
-                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-plugin="counterup" data-value="{{ $totalPembayaranSudah }}">{{ number_format($totalPembayaranSudah, 0, ',', '.') }}</span></h4>
-                                <p class="text-muted mb-1 text-truncate">Sudah Dibayarkan</p>
+                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-counter data-value="{{ $totalPembayaranSudah }}">{{ number_format($totalPembayaranSudah, 0, ',', '.') }}</span></h4>
+                                <p class="text-muted mb-1 text-truncate" title="Sudah Dibayarkan">Sudah Dibayarkan</p>
                             </div>
                         </div>
                     </div>
@@ -64,8 +64,8 @@
                             <div class="text-end">
                                 @php $belumBayar = max(0, $totalPembayaranBelum); @endphp
                                 <p class="text-muted mb-0 font-12">Rp.</p>
-                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-plugin="counterup" data-value="{{ $belumBayar }}">{{ number_format($belumBayar, 0, ',', '.') }}</span></h4>
-                                <p class="text-muted mb-1 text-truncate">Belum Dibayarkan</p>
+                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-counter data-value="{{ $belumBayar }}">{{ number_format($belumBayar, 0, ',', '.') }}</span></h4>
+                                <p class="text-muted mb-1 text-truncate" title="Belum Dibayarkan">Belum Dibayarkan</p>
                             </div>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
                             <div class="text-end">
                                 @php $persen = $totalTagihanUang > 0 ? min(100, round(($totalPembayaranSudah / $totalTagihanUang * 100), 1)) : 0; @endphp
                                 <h3 class="text-dark mt-1 font-18" style="white-space: nowrap;">{{ $persen }}%</h3>
-                                <p class="text-muted mb-1 text-truncate">Persentase Bayar</p>
+                                <p class="text-muted mb-1 text-truncate" title="Persentase Bayar">Persentase Bayar</p>
                             </div>
                         </div>
                     </div>
@@ -188,8 +188,8 @@
             });
             new ApexCharts(document.querySelector("#siswa-growth-chart"), siswaGrowthOptions).render();
 
-            // Counter animation — baca dari data-value bukan dari text (karena text sudah diformat)
-            $('[data-plugin="counterup"]').each(function() {
+            // Counter animation — baca dari data-value, pakai data-counter agar tidak bentrok dengan plugin bawaan template
+            $('[data-counter]').each(function() {
                 var $this = $(this),
                     to   = parseInt($this.attr('data-value'), 10) || 0,
                     from = 0,
@@ -202,9 +202,11 @@
                 var interval = setInterval(function() {
                     current += increase;
                     loopCount++;
-                    if (loopCount >= steps) { current = to; }
-                    $this.text(Math.floor(current).toLocaleString('id-ID'));
-                    if (loopCount >= steps) { clearInterval(interval); }
+                    if (loopCount >= steps) {
+                        current = to;
+                        clearInterval(interval);
+                    }
+                    $this.text(Math.round(current).toLocaleString('id-ID'));
                 }, refreshInterval);
             });
         });

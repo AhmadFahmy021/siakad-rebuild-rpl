@@ -111,16 +111,16 @@
                             @enderror
                         </div>
                         <div class="form-group mb-3">
-                            <label for="name" class="form-label">Kelas</label>
-                            <select class="form-select @error('user')
+                            <label for="kelas" class="form-label">Kelas</label>
+                            <select class="form-select @error('kelas')
                                 is-invalid
-                            @enderror" id="name" name="user">
-                                <option selected>Choose a Kelas (jangan pilih kelas apapun jika tagihan digunakan untuk semua kelas)</option>
+                            @enderror" id="kelas" name="kelas">
+                                <option selected value="">Choose a Kelas (jangan pilih kelas apapun jika tagihan digunakan untuk semua kelas)</option>
                                 @foreach ($kelas as $kelas)
                                     <option value="{{ $kelas->id }}">{{ $kelas->name }} | Guru : {{ $kelas->guru->user->name }}</option>
                                 @endforeach
                             </select>
-                            @error('user')
+                            @error('kelas')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
