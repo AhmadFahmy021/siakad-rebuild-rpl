@@ -10,7 +10,10 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box py-3">
-                <h2 class="text-dark fw-bold m-0 font-24">Halo, {{ $studentName }}!</h2>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <h2 class="text-dark fw-bold m-0 font-24">Halo, {{ $studentName }}!</h2>
+                    <span class="badge bg-soft-blue text-blue rounded-pill px-3 py-1 font-12 fw-bold" style="background-color: rgba(91, 109, 240, 0.15) !important; color: #5b6df0 !important;">Kelas {{ $className }}</span>
+                </div>
                 <h5 class="text-muted fw-normal mt-1 mb-0">Selamat datang kembali di dashboard akademik Anda.</h5>
             </div>
         </div>
@@ -119,7 +122,7 @@
                                     $times = array_keys($scheduleMatrix);
                                 @endphp
 
-                                @foreach($times as $idx => $timeSlot)
+                                @forelse($times as $idx => $timeSlot)
                                     <!-- Render Class slots -->
                                     <tr>
                                         <!-- Time slot -->
@@ -128,8 +131,8 @@
                                         <!-- Days -->
                                         @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $day)
                                             @php
-                                                $sched = $scheduleMatrix[$timeSlot][$day];
-                                                $subjName = $sched->mataPelajaran->nama ?? '';
+                                                $sched = $scheduleMatrix[$timeSlot][$day] ?? null;
+                                                $subjName = $sched->matapelajaran->nama ?? '';
                                                 
                                                 // Dynamic left border color based on subject name
                                                 $borderColor = '#e2e8f0';
@@ -168,33 +171,41 @@
                                             @if($sched)
                                                 <td class="p-2" style="background-color: {{ $bgTheme }}; border-left: 3px solid {{ $borderColor }} !important;">
                                                     <span class="d-block fw-bold text-dark font-13 mb-0">{{ $subjName }}</span>
-                                                    <!-- Room & Teacher are left empty if not in DB as requested -->
-                                                    <small class="text-muted font-11 d-block mt-1">
-                                                        <i class="mdi mdi-map-marker-outline me-1"></i> R. -
-                                                    </small>
+                                                    @if($sched->guru && $sched->guru->user)
+                                                        <small class="text-muted font-11 d-block mt-1 text-truncate" title="{{ $sched->guru->user->name }}">
+                                                            <i class="mdi mdi-account-outline me-1"></i> {{ $sched->guru->user->name }}
+                                                        </small>
+                                                    @else
+                                                        <small class="text-muted font-11 d-block mt-1">
+                                                            <i class="mdi mdi-map-marker-outline me-1"></i> R. -
+                                                        </small>
+                                                    @endif
                                                 </td>
                                             @else
-                                                <!-- Empty cell or weekend fallback -->
+                                                <!-- Empty cell -->
                                                 <td class="text-center text-muted font-12 p-2">
-                                                    @if($day === 'Jumat' && $timeSlot === '11:00 - 12:30')
-                                                        <span class="badge bg-soft-blue text-blue rounded px-2 py-1 font-11">Selesai</span>
-                                                    @else
-                                                        -
-                                                    @endif
+                                                    -
                                                 </td>
                                             @endif
                                         @endforeach
                                     </tr>
 
-                                    <!-- Insert break row after the first slot -->
-                                    @if($idx == 0)
+                                    <!-- Insert break row after the first slot if there are multiple slots -->
+                                    @if($idx == 0 && count($times) > 1)
                                         <tr class="table-light text-center font-12 text-muted fw-medium">
                                             <td colspan="6" class="py-1" style="background-color: #f8f9fa;">
                                                 <i class="mdi mdi-coffee-outline me-1"></i> Istirahat Pertama (09:00 - 09:30)
                                             </td>
                                         </tr>
                                     @endif
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4 font-13">
+                                            <i class="mdi mdi-calendar-blank font-20 d-block mb-1 text-secondary"></i>
+                                            Belum ada jadwal pelajaran untuk kelas ini.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

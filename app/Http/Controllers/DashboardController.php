@@ -10,6 +10,8 @@ use App\Models\Tugas;
 use App\Models\PengumpulanTugas;
 use App\Models\Nilai;
 use App\Models\Jadwal;
+use App\Models\Kelas;
+use App\Models\Konsultasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -71,40 +73,50 @@ class DashboardController extends Controller
             }
         }
 
-        // 3. Weekly Schedule Matrix (Monday to Friday, 3 timeslots)
-        $timeslots = [
-            '07:30:00 - 09:00:00' => '07:30 - 09:00',
-            '09:30:00 - 11:00:00' => '09:30 - 11:00',
-            '11:00:00 - 12:30:00' => '11:00 - 12:30',
-        ];
-
+        // 3. Weekly Schedule Matrix (Monday to Friday, dynamic timeslots from DB)
         $scheduleMatrix = [];
-        foreach ($timeslots as $timeKey => $timeLabel) {
-            $scheduleMatrix[$timeLabel] = [
-                'Senin' => null,
-                'Selasa' => null,
-                'Rabu' => null,
-                'Kamis' => null,
-                'Jumat' => null,
-            ];
-        }
-
         if ($kelasId) {
             $jadwalRaw = Jadwal::where('kelas_id', $kelasId)
-                ->with('mataPelajaran')
+                ->with(['matapelajaran', 'guru.user'])
                 ->get();
 
+            // Extract unique timeslots and sort them
+            $uniqueTimeslots = [];
+            foreach ($jadwalRaw as $j) {
+                $start = \Carbon\Carbon::parse($j->jam_mulai)->format('H:i');
+                $end = \Carbon\Carbon::parse($j->jam_selesai)->format('H:i');
+                $timeLabel = $start . ' - ' . $end;
+                $uniqueTimeslots[$timeLabel] = [
+                    'start' => $j->jam_mulai,
+                    'end' => $j->jam_selesai,
+                ];
+            }
+
+            // Sort timeslots chronologically by start time
+            uksort($uniqueTimeslots, function($a, $b) use ($uniqueTimeslots) {
+                return strtotime($uniqueTimeslots[$a]['start']) <=> strtotime($uniqueTimeslots[$b]['start']);
+            });
+
+            // Initialize matrix
+            foreach ($uniqueTimeslots as $timeLabel => $times) {
+                $scheduleMatrix[$timeLabel] = [
+                    'Senin' => null,
+                    'Selasa' => null,
+                    'Rabu' => null,
+                    'Kamis' => null,
+                    'Jumat' => null,
+                ];
+            }
+
+            // Populate matrix
             foreach ($jadwalRaw as $j) {
                 $day = ucfirst(strtolower($j->hari)); // Senin, Selasa...
-                $start = $j->jam_mulai;
-                $end = $j->jam_selesai;
+                $start = \Carbon\Carbon::parse($j->jam_mulai)->format('H:i');
+                $end = \Carbon\Carbon::parse($j->jam_selesai)->format('H:i');
+                $timeLabel = $start . ' - ' . $end;
 
-                foreach ($timeslots as $timeRange => $timeLabel) {
-                    [$tMulai, $tSelesai] = explode(' - ', $timeRange);
-                    if (strtotime($start) >= strtotime($tMulai) && strtotime($end) <= strtotime($tSelesai)) {
-                        $scheduleMatrix[$timeLabel][$day] = $j;
-                        break;
-                    }
+                if (array_key_exists($day, $scheduleMatrix[$timeLabel] ?? [])) {
+                    $scheduleMatrix[$timeLabel][$day] = $j;
                 }
             }
         }
@@ -142,5 +154,183 @@ class DashboardController extends Controller
 
     public function indexTataUsaha()  {
         return view('tu.index');
+    }
+
+    // Wali Kelas Methods
+
+    public function indexWalas()
+    {
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if (!$guru) {
+            abort(403, 'Aksi tidak diizinkan.');
+        }
+
+        $kelas = Kelas::where('guru_id', $guru->id)->first();
+        if (!$kelas) {
+            return redirect()->route('dashboard.guru')->with('error', 'Anda bukan wali kelas dari kelas manapun.');
+        }
+
+        // Get students in this class
+        $students = Siswa::whereHas('kelas', function ($query) use ($kelas) {
+            $query->where('kelas_id', $kelas->id);
+        })->with('user')->get();
+
+        // Calculate average grade
+        $totalSiswa = $students->count();
+        
+        $studentIds = $students->pluck('id');
+        $nilaiRaw = Nilai::whereIn('siswa_id', $studentIds)->get()->groupBy('siswa_id');
+
+        foreach ($students as $student) {
+            $grades = $nilaiRaw->get($student->id);
+            if ($grades && $grades->count() > 0) {
+                $student->rata_rata_nilai = $grades->avg('nilai');
+            } else {
+                $student->rata_rata_nilai = 0;
+            }
+        }
+
+        return view('guru.walas', compact('kelas', 'students', 'totalSiswa'));
+    }
+
+    public function showWalasSiswa($siswaId)
+    {
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if (!$guru) {
+            abort(403, 'Aksi tidak diizinkan.');
+        }
+
+        $kelas = Kelas::where('guru_id', $guru->id)->first();
+        if (!$kelas) {
+            abort(403, 'Anda bukan wali kelas.');
+        }
+
+        $siswa = Siswa::where('id', $siswaId)->with('user')->firstOrFail();
+
+        // Security check
+        $belongsToClass = $siswa->kelas()->where('kelas.id', $kelas->id)->exists();
+        if (!$belongsToClass) {
+            abort(403, 'Siswa tidak berada di kelas Anda.');
+        }
+
+        // Calculate class rank
+        $allClassStudents = Siswa::whereHas('kelas', function ($query) use ($kelas) {
+            $query->where('kelas_id', $kelas->id);
+        })->get();
+
+        $studentIds = $allClassStudents->pluck('id');
+        $allGrades = Nilai::whereIn('siswa_id', $studentIds)->get()->groupBy('siswa_id');
+
+        foreach ($allClassStudents as $s) {
+            $grades = $allGrades->get($s->id);
+            $s->rata_rata_nilai = ($grades && $grades->count() > 0) ? $grades->avg('nilai') : 0;
+        }
+
+        $rankedStudents = $allClassStudents->sortByDesc('rata_rata_nilai')->values();
+        $rank = 1;
+        foreach ($rankedStudents as $index => $s) {
+            if ($s->id === $siswa->id) {
+                $rank = $index + 1;
+                break;
+            }
+        }
+        $totalSiswa = $allClassStudents->count();
+
+        // Fetch grades for academic performance table
+        $nilaiRaw = Nilai::where('siswa_id', $siswa->id)
+            ->where('kelas_id', $kelas->id)
+            ->with('matapelajaran')
+            ->get();
+
+        $nilaiTransformed = $nilaiRaw->map(function ($n) {
+            $finalScore = $n->nilai;
+            
+            $predikat = 'D';
+            if ($finalScore >= 95) {
+                $predikat = 'A+';
+            } elseif ($finalScore >= 90) {
+                $predikat = 'A';
+            } elseif ($finalScore >= 85) {
+                $predikat = 'A-';
+            } elseif ($finalScore >= 80) {
+                $predikat = 'B+';
+            } elseif ($finalScore >= 75) {
+                $predikat = 'B';
+            } elseif ($finalScore >= 70) {
+                $predikat = 'B-';
+            } elseif ($finalScore >= 65) {
+                $predikat = 'C+';
+            } elseif ($finalScore >= 60) {
+                $predikat = 'C';
+            }
+
+            $remarks = 'Tuntas, terus tingkatkan prestasi belajar Anda.';
+            if ($finalScore >= 90) {
+                $remarks = 'Sangat memuaskan, luar biasa mempertahankan pencapaian.';
+            } elseif ($finalScore < 75) {
+                $remarks = 'Memerlukan usaha lebih besar dan bimbingan tambahan.';
+            }
+
+            return (object) [
+                'subject_name' => $n->matapelajaran->nama ?? 'Tidak Diketahui',
+                'score' => $finalScore,
+                'kkm' => 75,
+                'grade' => $predikat,
+                'remarks' => $remarks,
+            ];
+        });
+
+        $rataRata = $nilaiTransformed->count() > 0 ? $nilaiTransformed->avg('score') : 0;
+
+        // Fetch latest note (from konsultasi table)
+        $catatan = Konsultasi::where('siswa_id', $siswa->id)
+            ->where('kelas_id', $kelas->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return view('guru.walas_detail', compact('kelas', 'siswa', 'nilaiTransformed', 'rataRata', 'rank', 'totalSiswa', 'catatan'));
+    }
+
+    public function storeWalasCatatan(Request $request, $siswaId)
+    {
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if (!$guru) {
+            abort(403, 'Aksi tidak diizinkan.');
+        }
+
+        $kelas = Kelas::where('guru_id', $guru->id)->first();
+        if (!$kelas) {
+            abort(403, 'Anda bukan wali kelas.');
+        }
+
+        $siswa = Siswa::where('id', $siswaId)->firstOrFail();
+        $belongsToClass = $siswa->kelas()->where('kelas.id', $kelas->id)->exists();
+        if (!$belongsToClass) {
+            abort(403, 'Siswa tidak berada di kelas Anda.');
+        }
+
+        $request->validate([
+            'catatan' => 'required|string|max:500',
+        ]);
+
+        Konsultasi::updateOrCreate(
+            [
+                'siswa_id' => $siswa->id,
+                'kelas_id' => $kelas->id,
+            ],
+            [
+                'title' => 'Catatan Wali Kelas',
+                'description' => $request->catatan,
+            ]
+        );
+
+        if (class_exists(\RealRashid\SweetAlert\Facades\Alert::class)) {
+            \RealRashid\SweetAlert\Facades\Alert::success('Berhasil', 'Catatan perkembangan siswa berhasil disimpan.');
+        }
+
+        return redirect()->route('guru.walas.siswa', $siswa->id)->with('success', 'Catatan perkembangan siswa berhasil disimpan.');
     }
 }
