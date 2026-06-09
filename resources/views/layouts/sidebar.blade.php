@@ -145,6 +145,13 @@
 
             {{-- GURU --}}
             @if(Request::is('guru/*'))
+                @php
+                    $isWaliKelas = false;
+                    $guruModel = \App\Models\Guru::where('user_id', Auth::id())->first();
+                    if ($guruModel) {
+                        $isWaliKelas = \App\Models\Kelas::where('guru_id', $guruModel->id)->exists();
+                    }
+                @endphp
 
                 <li class="menu-item {{ Request::is('guru/dashboard') ? 'menuitem-active' : '' }}">
                     <a href="{{ url('guru/dashboard') }}" class="menu-link">
@@ -154,6 +161,17 @@
                         <span class="menu-text">Dashboard Guru</span>
                     </a>
                 </li>
+
+                @if($isWaliKelas)
+                    <li class="menu-item {{ Request::is('guru/walas*') ? 'menuitem-active' : '' }}">
+                        <a href="{{ url('guru/walas') }}" class="menu-link {{ Request::is('guru/walas*') ? 'active' : '' }}">
+                            <span class="menu-icon">
+                                <i data-feather="users"></i>
+                            </span>
+                            <span class="menu-text">Wali Kelas</span>
+                        </a>
+                    </li>
+                @endif
 
             @endif
 
