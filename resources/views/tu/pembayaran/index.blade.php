@@ -67,11 +67,17 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('tu/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                        {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
-                                        <a href="{{ url('tu/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
-                                            disabled
-                                        @endif" data-confirm-delete="true">Delete</a>
+                                        @if ($item->bank_id == null)
+
+                                            <a href="{{ url('tu/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                            {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
+                                            <a href="{{ url('tu/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
+                                                disabled
+                                            @endif" data-confirm-delete="true">Delete</a>
+                                        @else
+                                            <a href="" class="btn btn-outline-secondary btn-sm"     >Approve</a>
+                                            <a href="" class="btn btn-outline-danger btn-sm" >Reject</a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
