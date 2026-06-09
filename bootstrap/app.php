@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\CheckAccessAdmin;
 use App\Http\Middleware\CheckAccessGuru;
+use App\Http\Middleware\CheckAccessOrangTua;
+use App\Http\Middleware\CheckAccessOrtu;
 use App\Http\Middleware\CheckAccessSiswa;
 use App\Http\Middleware\CheckAccessTataUsaha;
 use Illuminate\Foundation\Application;
@@ -21,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.tu' => CheckAccessTataUsaha::class,
             'check.guru' => CheckAccessGuru::class,
             // 'check.orangtua' => CheckAccessOrangTua::class,
+            'check.orangtua' => CheckAccessOrtu::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

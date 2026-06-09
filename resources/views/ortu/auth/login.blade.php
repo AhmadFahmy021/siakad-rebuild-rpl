@@ -51,17 +51,17 @@
 
                         <!-- title-->
                         <h4 class="mt-0">Log In</h4>
-                        <p class="text-muted mb-4">Enter your email address and password to access account.</p>
+                        <p class="text-muted mb-4">Enter name siswa and name ibu to access report siswa.</p>
 
                         <!-- form -->
-                        <form action="{{ route('login') }}" method="POST">
+                        <form action="{{ url('ortu/login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="emailaddress" class="form-label">Email address</label>
-                                <input class="form-control @error('email')
+                                <label for="namasiswa" class="form-label">Nama Lengkap Siswa</label>
+                                <input class="form-control @error('namasiswa')
                                     is-invalid
-                                @enderror" type="email" name="email" id="emailaddress" required="" placeholder="Enter your email">
-                                @error('email')
+                                @enderror" type="text" name="namasiswa" id="namasiswa" required="" placeholder="Enter nama siswa">
+                                @error('namasiswa')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -69,12 +69,12 @@
                             </div>
                             <div class="mb-3">
                                 {{-- <a href="auth-recoverpw-2.html" class="text-muted float-end"><small>Forgot your password?</small></a> --}}
-                                <label for="password" class="form-label">Password</label>
+                                <label for="namaorangtua" class="form-label">Nama Orang Tua</label>
                                 <div class="input-group input-group-merge">
-                                    <input type="password" name="password" id="password" class="form-control @error('password')
+                                    <input type="text" name="namaorangtua" id="namaorangtua" class="form-control @error('namaorangtua')
                                         is-invalid
-                                    @enderror" placeholder="Enter your password">
-                                    @error('password')
+                                    @enderror" placeholder="Enter nama orang tua siswa">
+                                    @error('namaorangtua')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -90,8 +90,7 @@
 
                         <!-- Footer-->
                         <footer class="footer footer-alt mb-3" style="display: block;">
-                            <p class="text-muted">Don't have an account? <a href="{{ url('register') }}" class="text-muted ms-1"><b>Sign Up</b></a></p>
-                            <p class="text-uppercase">Portal Orang Tua / Wali <a href="{{ url('ortu/login') }}" class="text-muted ms-1"><b>Sign In</b></a></p>
+                            <p class="text-muted">Siswa ? <a href="{{ url('login') }}" class="text-primary fw-bold ms-1"><b>Sign In</b></a></p>
                         </footer>
 
                     </div> <!-- end .card-body -->

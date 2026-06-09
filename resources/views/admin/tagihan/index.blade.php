@@ -25,6 +25,7 @@
                                 <th>Nama Tagihan</th>
                                 <th>Deskripsi</th>
                                 <th>Kategori</th>
+                                <th>Nominal</th>
                                 <th>Kelas</th>
                                 <th>Action</th>
                             </tr>
@@ -35,8 +36,9 @@
                             @foreach ($tagihans as $item)
                                 <tr>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->deskripsi }}</td>
+                                    <td style="max-width: 350px; white-space: normal;">{{ $item->deskripsi }}</td>
                                     <td>{{ $item->category }}</td>
+                                    <td class="fw-bold">Rp {{ number_format($item->nominal, 0, ',', '.') }}</td>
                                     <td class="fw-bold">{{ $item->kelas_id ? $item->kelas->name : 'Semua Kelas' }}</td>
                                     {{-- <td>{{ $item->semua_kelas ? '✅' : '❌' }}</td> --}}
                                     <td>
@@ -98,13 +100,24 @@
                             @enderror
                         </div>
                         <div class="form-group mb-3">
+                            <label for="nama_bank" class="form-label">Nominal</label>
+                            <input class="form-control @error('nominal')
+                                is-invalid
+                            @enderror" id="nama_bank" name="nominal" type="number" placeholder="Masukkan nominal">
+                            @error('nominal')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="name" class="form-label">Kelas</label>
                             <select class="form-select @error('user')
                                 is-invalid
                             @enderror" id="name" name="user">
                                 <option selected>Choose a Kelas (jangan pilih kelas apapun jika tagihan digunakan untuk semua kelas)</option>
                                 @foreach ($kelas as $kelas)
-                                    <option value="{{ $kelas->id }}"> Guru :  {{ $kelas->name }} | {{ $kelas->guru->user->name }}</option>
+                                    <option value="{{ $kelas->id }}">{{ $kelas->name }} | Guru : {{ $kelas->guru->user->name }}</option>
                                 @endforeach
                             </select>
                             @error('user')

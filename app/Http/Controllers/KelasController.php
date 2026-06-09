@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\SiswaKelas;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class KelasController extends Controller
 {
@@ -12,7 +16,10 @@ class KelasController extends Controller
      */
     public function index()
     {
-        //
+        $kelas = Kelas::with(('guru.user'))->get();
+        $guru = Guru::with('user')->whereNotIn('id', $kelas->pluck('guru_id'))->get();
+        confirmDelete("Delete Kelas!","Apakah Anda yakin ingin menghapus kelas ini?");
+        return view('tu.kelas.index', compact('kelas', 'guru'));
     }
 
     /**
@@ -28,7 +35,18 @@ class KelasController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'kelas' => 'required|string|max:255',
+            'guru' => 'required|exists:guru,id',
+        ]);
+
+        Kelas::create([
+            'name' => $request->kelas,
+            'guru_id' => $request->guru,
+        ]);
+
+        Alert::success('Success', 'Kelas created successfully');
+        return redirect('/tu/kelas');
     }
 
     /**
@@ -44,7 +62,8 @@ class KelasController extends Controller
      */
     public function edit(Kelas $kelas)
     {
-        //
+        $guru = Guru::with('user')->get();
+        return view('tu.kelas.edit', compact('kelas', 'guru'));
     }
 
     /**
@@ -52,7 +71,18 @@ class KelasController extends Controller
      */
     public function update(Request $request, Kelas $kelas)
     {
-        //
+        $request->validate([
+            'kelas' => 'required|string|max:255',
+            'guru' => 'required|exists:guru,id',
+        ]);
+
+        $kelas->update([
+            'name' => $request->kelas,
+            'guru_id' => $request->guru,
+        ]);
+
+        Alert::success('Success', 'Kelas updated successfully');
+        return redirect('/tu/kelas');
     }
 
     /**
@@ -60,6 +90,14 @@ class KelasController extends Controller
      */
     public function destroy(Kelas $kelas)
     {
-        //
+        $kelas->delete();
+        Alert::success('Success', 'Kelas deleted successfully');
+        return redirect('/tu/kelas');
+    }
+
+    public function kelola(Kelas $kelas) {
+        $siswaKelas = SiswaKelas::with('siswa.user')->where('kelas_id', $kelas->id)->get()->pluck('siswa_id');
+        $siswa = Siswa::with('user')->whereNotIn('id', $siswaKelas)->get();
+        return view('tu.kelas.kelola', compact('kelas', 'siswa', 'siswaKelas'));
     }
 }

@@ -67,9 +67,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('admin/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                        <a href="{{ url('tu/pembayaran/' . $item->id . '/edit') }}" class="btn btn-outline-primary btn-sm">Edit</a>
                                         {{-- <a href="{{ route('guru.destroy', $item->id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> --}}
-                                        <a href="{{ url('admin/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
+                                        <a href="{{ url('tu/pembayaran/' . $item->id) }}" class="btn btn-outline-danger btn-sm @if (Auth::user()->id === $item->id)
                                             disabled
                                         @endif" data-confirm-delete="true">Delete</a>
                                     </td>
@@ -90,7 +90,7 @@
                     <h4 class="modal-title" id="add-pembayaran-modalLabel">Add Pembayaran</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('admin/pembayaran') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ url('tu/pembayaran') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="form-group mb-3">
@@ -123,6 +123,19 @@
                             @enderror
                         </div>
                         <div class="form-group mb-3">
+                            <label for="tagihan" class="form-label">Tagihan</label>
+                            <select class="form-select @error('tagihan')
+                                is-invalid
+                            @enderror" id="tagihan" name="tagihan" onchange="changeNominal(this.value)">
+                                <option selected disabled>Choose a tagihan</option>
+                            </select>
+                            @error('tagihan')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="tanggal" class="form-label">Tanggal</label>
                             <input class="form-control @error('tanggal')
                                 is-invalid
@@ -135,6 +148,7 @@
                         </div>
                         <div class="form-group mb-3">
                             <label for="nominal" class="form-label">Nominal</label>
+                            <p class="text-black font-15 mb-4" id="nominalDisplay" hidden="true"><span id="nominalValue"></span></p>
                             <input class="form-control @error('nominal')
                                 is-invalid
                             @enderror" id="nominal" name="nominal" type="number" placeholder="Masukkan nominal pembayaran">
@@ -150,19 +164,6 @@
                                 is-invalid
                             @enderror" id="semester" name="semester" type="text" placeholder="Masukkan semester pembayaran">
                             @error('semester')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="tagihan" class="form-label">Tagihan</label>
-                            <select class="form-select @error('tagihan')
-                                is-invalid
-                            @enderror" id="tagihan" name="tagihan">
-                                <option selected disabled>Choose a tagihan</option>
-                            </select>
-                            @error('tagihan')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -216,7 +217,7 @@
         );
 
         $.ajax({
-            url: '/admin/ajax/pembayaran/siswa/' + kelasId,
+            url: '/ajax/pembayaran/siswa/' + kelasId,
             type: 'GET',
             dataType: 'json',
             success: function (response) {
@@ -249,7 +250,7 @@
         );
 
         $.ajax({
-            url: '/admin/ajax/pembayaran/tagihan/' + tagihanId,
+            url: '/ajax/pembayaran/tagihan/' + tagihanId,
             type: 'GET',
             dataType: 'json',
             success: function (response) {
@@ -266,6 +267,41 @@
                     `);
 
                 });
+
+            },
+            error: function () {
+
+                alert('Gagal mengambil data tagihan');
+
+            }
+
+        });
+    }
+
+    function changeNominal(tagihanId) {
+
+        $("#nominal").val("");
+        $.ajax({
+            url: '/ajax/pembayaran/tagihan/' + tagihanId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+
+                // $('#tagihan').html(
+                //     '<option selected disabled>Pilih tagihan</option>'
+                // );
+                $("#nominal").val(response[0].nominal);
+                $("#nominal").attr('readonly', true);
+                $("#nominal").attr('hidden', true);
+
+                $("#nominalDisplay").attr('hidden', false);
+                // $("#nominalValue").text(response[0].nominal);
+                $("#nominalValue").text(
+                    new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR'
+                    }).format(response[0].nominal)
+                );
 
             },
             error: function () {

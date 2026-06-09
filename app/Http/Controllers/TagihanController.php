@@ -37,12 +37,14 @@ class TagihanController extends Controller
             'name' => 'required',
             'deskripsi' => 'required',
             'category' => 'required',
+            'nominal' => 'required|integer|min:0',
         ]);
 
         $req = [
             'name' => $request->name,
             'deskripsi' => $request->deskripsi,
             'category' => $request->category,
+            'nominal' => $request->nominal,
             'kelas_id' => $request->user, // Assuming the select field name is 'kelas'
         ];
 
@@ -78,12 +80,14 @@ class TagihanController extends Controller
             'name' => 'sometimes',
             'deskripsi' => 'sometimes',
             'category' => 'sometimes',
+            'nominal' => 'sometimes|integer|min:0',
         ]);
 
         $req = [
             'name' => $request->name,
             'deskripsi' => $request->deskripsi,
             'category' => $request->category,
+            'nominal' => $request->nominal,
             'kelas_id' => $request->user, // Assuming the select field name is 'kelas'
         ];
 

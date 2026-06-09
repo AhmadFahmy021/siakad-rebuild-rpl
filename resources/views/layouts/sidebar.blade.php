@@ -145,6 +145,13 @@
 
             {{-- GURU --}}
             @if(Request::is('guru/*'))
+                @php
+                    $isWaliKelas = false;
+                    $guruModel = \App\Models\Guru::where('user_id', Auth::id())->first();
+                    if ($guruModel) {
+                        $isWaliKelas = \App\Models\Kelas::where('guru_id', $guruModel->id)->exists();
+                    }
+                @endphp
 
                 <li class="menu-item {{ Request::is('guru/dashboard') ? 'menuitem-active' : '' }}">
                     <a href="{{ url('guru/dashboard') }}" class="menu-link">
@@ -154,6 +161,17 @@
                         <span class="menu-text">Dashboard Guru</span>
                     </a>
                 </li>
+
+                @if($isWaliKelas)
+                    <li class="menu-item {{ Request::is('guru/walas*') ? 'menuitem-active' : '' }}">
+                        <a href="{{ url('guru/walas') }}" class="menu-link {{ Request::is('guru/walas*') ? 'active' : '' }}">
+                            <span class="menu-icon">
+                                <i data-feather="users"></i>
+                            </span>
+                            <span class="menu-text">Wali Kelas</span>
+                        </a>
+                    </li>
+                @endif
 
             @endif
 
@@ -169,6 +187,30 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
+                <li class="menu-item {{ Request::is('siswa/tugas') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/tugas') }}" class="menu-link {{ Request::is('siswa/tugas') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="check-square"></i>
+                        </span>
+                        <span class="menu-text">Tugas</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('siswa/konsultasi') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/konsultasi') }}" class="menu-link {{ Request::is('siswa/konsultasi') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="mail"></i>
+                        </span>
+                        <span class="menu-text">Konsultasi</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('siswa/nilai') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('siswa/nilai') }}" class="menu-link {{ Request::is('siswa/nilai') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="star"></i>
+                        </span>
+                        <span class="menu-text">Nilai</span>
+                    </a>
+                </li>
 
             @endif
 
@@ -178,10 +220,65 @@
 
                 <li class="menu-item {{ Request::is('tu/dashboard') ? 'menuitem-active' : '' }}">
                     <a href="{{ url('tu/dashboard') }}" class="menu-link {{ Request::is('tu/dashboard') ? 'active' : '' }}">
-                        <span class="menu-icon">
-                            <i data-feather="airplay"></i>
-                        </span>
-                        <span class="menu-text">Dashboard TU</span>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/pembayaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/pembayaran') }}" class="menu-link {{ Request::is('tu/pembayaran') ? 'active' : '' }}">
+                        <span class="menu-text">Pembayaran</span>
+                    </a>
+                </li>
+                {{-- <li class="menu-item">
+                    <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
+                        <span class="menu-text"> Kelas </span>
+                    </a>
+                    <div class="collapse" id="menuDashboards">
+                        <ul class="sub-menu">
+                            <li class="menu-item">
+                                <a href="index.html" class="menu-link">
+                                    <span class="menu-text">Kelola Kelas</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="dashboard-2.html" class="menu-link">
+                                    <span class="menu-text"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li> --}}
+                <li class="menu-item {{ Request::is('tu/kelas/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/kelas') }}" class="menu-link {{ Request::is('tu/kelas') ? 'active' : '' }}">
+                        <span class="menu-text">Kelas</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/matapelajaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/matapelajaran') }}" class="menu-link {{ Request::is('tu/matapelajaran') ? 'active' : '' }}">
+                        <span class="menu-text">Mata Pelajaran</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('tu/jadwal/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('tu/jadwal') }}" class="menu-link {{ Request::is('tu/jadwal') ? 'active' : '' }}">
+                        <span class="menu-text">Jadwal</span>
+                    </a>
+                </li>
+
+            @endif
+            @if(Request::is('ortu/*'))
+
+                <li class="menu-item {{ Request::is('ortu/dashboard') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/dashboard') }}" class="menu-link {{ Request::is('ortu/dashboard') ? 'active' : '' }}">
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('ortu/pembayaran/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/pembayaran') }}" class="menu-link {{ Request::is('ortu/pembayaran') ? 'active' : '' }}">
+                        <span class="menu-text">Pembayaran</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('ortu/jadwal/*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/jadwal') }}" class="menu-link {{ Request::is('ortu/jadwal') ? 'active' : '' }}">
+                        <span class="menu-text">Jadwal</span>
                     </a>
                 </li>
 

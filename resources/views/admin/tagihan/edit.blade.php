@@ -52,6 +52,17 @@
                         @enderror
                     </div>
                     <div class="form-group mb-3">
+                        <label for="nominal" class="form-label">Nominal</label>
+                        <input class="form-control @error('nominal')
+                            is-invalid
+                        @enderror" id="nominal" name="nominal" type="number" placeholder="Masukkan nominal" value="{{ old('nominal', $tagihan->nominal) }}">
+                        @error('nominal')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group mb-3">
                         <label for="user" class="form-label">Kelas</label>
                         <select class="form-select @error('user')
                             is-invalid
