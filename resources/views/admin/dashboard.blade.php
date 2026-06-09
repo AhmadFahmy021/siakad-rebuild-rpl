@@ -3,23 +3,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                {{-- <div class="page-title-right">
-                    <form class="d-flex align-items-center mb-3">
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control border" id="dash-daterange">
-                            <span class="input-group-text bg-blue border-blue text-white">
-                                <i class="mdi mdi-calendar-range"></i>
-                            </span>
-                        </div>
-                        <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
-                            <i class="mdi mdi-autorenew"></i>
-                        </a>
-                        <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-1">
-                            <i class="mdi mdi-filter-variant"></i>
-                        </a>
-                    </form>
-                </div> --}}
-                <h4 class="page-title">Dashboard</h4>
+                <h4 class="page-title">Dashboard Admin</h4>
             </div>
         </div>
     </div>
@@ -28,82 +12,201 @@
         <div class="col-md-6 col-xl-3">
             <div class="widget-rounded-circle card">
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-6">
                             <div class="avatar-lg rounded-circle bg-soft-primary border-primary border">
-                                <i class="fe-heart font-22 avatar-title text-primary"></i>
+                                <i class="fe-file-text font-22 avatar-title text-primary"></i>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1">$<span data-plugin="counterup">58,947</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Total Revenue</p>
+                                <p class="text-muted mb-0 font-12">Rp.</p>
+                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-plugin="counterup" data-value="{{ $totalTagihanUang }}">{{ number_format($totalTagihanUang, 0, ',', '.') }}</span></h4>
+                                <p class="text-muted mb-1 text-truncate">Total Tagihan</p>
                             </div>
                         </div>
-                    </div> <!-- end row-->
+                    </div>
                 </div>
-            </div> <!-- end widget-rounded-circle-->
-        </div> <!-- end col-->
+            </div>
+        </div>
 
         <div class="col-md-6 col-xl-3">
             <div class="widget-rounded-circle card">
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-6">
                             <div class="avatar-lg rounded-circle bg-soft-success border-success border">
-                                <i class="fe-shopping-cart font-22 avatar-title text-success"></i>
+                                <i class="fe-check-circle font-22 avatar-title text-success"></i>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">127</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Today's Sales</p>
+                                <p class="text-muted mb-0 font-12">Rp.</p>
+                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-plugin="counterup" data-value="{{ $totalPembayaranSudah }}">{{ number_format($totalPembayaranSudah, 0, ',', '.') }}</span></h4>
+                                <p class="text-muted mb-1 text-truncate">Sudah Dibayarkan</p>
                             </div>
                         </div>
-                    </div> <!-- end row-->
+                    </div>
                 </div>
-            </div> <!-- end widget-rounded-circle-->
-        </div> <!-- end col-->
+            </div>
+        </div>
 
         <div class="col-md-6 col-xl-3">
             <div class="widget-rounded-circle card">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
-                                <i class="fe-bar-chart-line- font-22 avatar-title text-info"></i>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">0.58</span>%</h3>
-                                <p class="text-muted mb-1 text-truncate">Conversion</p>
-                            </div>
-                        </div>
-                    </div> <!-- end row-->
-                </div>
-            </div> <!-- end widget-rounded-circle-->
-        </div> <!-- end col-->
-
-        <div class="col-md-6 col-xl-3">
-            <div class="widget-rounded-circle card">
-                <div class="card-body">
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-6">
                             <div class="avatar-lg rounded-circle bg-soft-warning border-warning border">
-                                <i class="fe-eye font-22 avatar-title text-warning"></i>
+                                <i class="fe-alert-circle font-22 avatar-title text-warning"></i>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">78.41</span>k</h3>
-                                <p class="text-muted mb-1 text-truncate">Today's Visits</p>
+                                @php $belumBayar = max(0, $totalPembayaranBelum); @endphp
+                                <p class="text-muted mb-0 font-12">Rp.</p>
+                                <h4 class="text-dark mt-0 mb-1 font-18" style="white-space: nowrap;"><span data-plugin="counterup" data-value="{{ $belumBayar }}">{{ number_format($belumBayar, 0, ',', '.') }}</span></h4>
+                                <p class="text-muted mb-1 text-truncate">Belum Dibayarkan</p>
                             </div>
                         </div>
-                    </div> <!-- end row-->
+                    </div>
                 </div>
-            </div> <!-- end widget-rounded-circle-->
-        </div> <!-- end col-->
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="widget-rounded-circle card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-6">
+                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
+                                <i class="fe-bar-chart-2 font-22 avatar-title text-info"></i>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-end">
+                                @php $persen = $totalTagihanUang > 0 ? min(100, round(($totalPembayaranSudah / $totalTagihanUang * 100), 1)) : 0; @endphp
+                                <h3 class="text-dark mt-1 font-18" style="white-space: nowrap;">{{ $persen }}%</h3>
+                                <p class="text-muted mb-1 text-truncate">Persentase Bayar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- end row-->
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Pertumbuhan Guru (12 Bulan Terakhir)</h4>
+                    <div dir="ltr">
+                        <div id="guru-growth-chart" class="mt-4" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Pertumbuhan Siswa (12 Bulan Terakhir)</h4>
+                    <div dir="ltr">
+                        <div id="siswa-growth-chart" class="mt-4" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Rincian Pembayaran Per Kategori Tagihan</h4>
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-hover table-nowrap m-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Kategori Tagihan</th>
+                                    <th class="text-end">Jumlah Pembayaran (Rp)</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($tagihanBayarPerKategori as $kategori => $nominal)
+                                    <tr>
+                                        <td><h5 class="m-0 fw-normal">{{ $kategori }}</h5></td>
+                                        <td class="text-end"><h5 class="m-0">Rp. {{ number_format($nominal, 0, ',', '.') }}</h5></td>
+                                        <td class="text-center"><span class="badge bg-success">Sudah Approve</span></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">Tidak ada data pembayaran yang sudah di-approve</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+{{-- Ganti @push('scripts') -> @section('js') karena layout pakai @yield('js'), bukan @stack('scripts') --}}
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest/dist/apexcharts.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            var sharedLineOptions = {
+                chart: { type: 'line', toolbar: { show: false } },
+                stroke: { curve: 'smooth', width: 2 },
+                dataLabels: { enabled: false },
+                grid: { borderColor: '#eef2f7' },
+                markers: { size: 4 },
+                xaxis: { categories: {!! json_encode($months) !!} }
+            };
+
+            var guruGrowthOptions = Object.assign({}, sharedLineOptions, {
+                series: [{ name: 'Jumlah Guru', data: {!! json_encode($guruData) !!} }],
+                colors: ['#4a81d4'],
+                tooltip: {
+                    y: { formatter: function(val) { return val + ' Guru'; } }
+                }
+            });
+            new ApexCharts(document.querySelector("#guru-growth-chart"), guruGrowthOptions).render();
+
+            var siswaGrowthOptions = Object.assign({}, sharedLineOptions, {
+                series: [{ name: 'Jumlah Siswa', data: {!! json_encode($siswaData) !!} }],
+                colors: ['#1abc9c'],
+                tooltip: {
+                    y: { formatter: function(val) { return val + ' Siswa'; } }
+                }
+            });
+            new ApexCharts(document.querySelector("#siswa-growth-chart"), siswaGrowthOptions).render();
+
+            // Counter animation — baca dari data-value bukan dari text (karena text sudah diformat)
+            $('[data-plugin="counterup"]').each(function() {
+                var $this = $(this),
+                    to   = parseInt($this.attr('data-value'), 10) || 0,
+                    from = 0,
+                    speed = 1500,
+                    refreshInterval = 50,
+                    steps = speed / refreshInterval,
+                    increase = to / steps;
+
+                var loopCount = 0, current = from;
+                var interval = setInterval(function() {
+                    current += increase;
+                    loopCount++;
+                    if (loopCount >= steps) { current = to; }
+                    $this.text(Math.floor(current).toLocaleString('id-ID'));
+                    if (loopCount >= steps) { clearInterval(interval); }
+                }, refreshInterval);
+            });
+        });
+    </script>
 @endsection

@@ -58,9 +58,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('/bank', BankController::class);
         Route::resource('/tagihan', TagihanController::class);
 
-        Route::get('/ajax/pembayaran/siswa/{kelasId}', [PembayaranController::class, 'getSiswaByKelas']);
-        Route::get('/ajax/pembayaran/tagihan/{kelasId}', [PembayaranController::class, 'getTagihanByKelasId']);
     });
+    
+    Route::get('/ajax/pembayaran/siswa/{kelasId}', [PembayaranController::class, 'getSiswaByKelas']);
+    Route::get('/ajax/pembayaran/tagihan/{kelasId}', [PembayaranController::class, 'getTagihanByKelasId']);
+    Route::get('/ajax/pembayaran/tagihan/{tagihanId}', [PembayaranController::class, 'getTagihanByTagihanId']);
 
     Route::prefix('guru')->middleware(['check.guru'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexGuru'])->name('dashboard.guru');
