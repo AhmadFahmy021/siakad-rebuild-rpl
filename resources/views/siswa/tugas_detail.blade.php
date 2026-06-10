@@ -4,37 +4,30 @@
     @php
         $mapelName = $tugas->matapelajaran->nama ?? null;
         $mapelLower = strtolower($mapelName ?? '');
-        $iconClass = 'mdi mdi-book-open-page-variant';
-        $bannerGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        $bannerColor = 'blue';
-        $avatarBg = 'bg-soft-blue';
-        $textColor = 'text-blue';
 
-        if (str_contains($mapelLower, 'matematika') || str_contains($mapelLower, 'math')) {
-            $iconClass = 'mdi mdi-calculator';
-            $bannerGradient = 'linear-gradient(135deg, #2b5876 0%, #4e4376 100%)';
-            $bannerColor = 'blue';
-            $avatarBg = 'bg-soft-blue';
-            $textColor = 'text-blue';
-        } elseif (str_contains($mapelLower, 'kimia') || str_contains($mapelLower, 'fisika') || str_contains($mapelLower, 'biologi') || str_contains($mapelLower, 'ipa')) {
-            $iconClass = 'mdi mdi-flask-outline';
-            $bannerGradient = 'linear-gradient(135deg, #2b9348 0%, #80b918 100%)';
-            $bannerColor = 'info';
-            $avatarBg = 'bg-soft-info';
-            $textColor = 'text-info';
-        } elseif (str_contains($mapelLower, 'bahasa') || str_contains($mapelLower, 'sastra') || str_contains($mapelLower, 'indonesia') || str_contains($mapelLower, 'inggris')) {
-            $iconClass = 'mdi mdi-book-open-variant';
-            $bannerGradient = 'linear-gradient(135deg, #a71d31 0%, #3f0d12 100%)';
-            $bannerColor = 'danger';
-            $avatarBg = 'bg-soft-danger';
-            $textColor = 'text-danger';
-        } elseif (str_contains($mapelLower, 'komputer') || str_contains($mapelLower, 'informatika') || str_contains($mapelLower, 'tik') || str_contains($mapelLower, 'rpl')) {
-            $iconClass = 'mdi mdi-laptop';
-            $bannerGradient = 'linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)';
-            $bannerColor = 'success';
-            $avatarBg = 'bg-soft-success';
-            $textColor = 'text-success';
-        }
+        // Pool warna & ikon yang di-assign otomatis berdasarkan ID mapel
+        $colorPool = [
+            ['gradient' => 'linear-gradient(135deg, #5b6df0 0%, #3b4cb8 100%)', 'text' => 'text-primary', 'icon' => 'mdi mdi-book-open-page-variant', 'color' => 'blue', 'avatarBg' => 'bg-soft-primary'],
+            ['gradient' => 'linear-gradient(135deg, #00b4db 0%, #0083b0 100%)', 'text' => 'text-info', 'icon' => 'mdi mdi-flask-outline', 'color' => 'info', 'avatarBg' => 'bg-soft-info'],
+            ['gradient' => 'linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)', 'text' => 'text-success', 'icon' => 'mdi mdi-laptop', 'color' => 'success', 'avatarBg' => 'bg-soft-success'],
+            ['gradient' => 'linear-gradient(135deg, #d32f2f 0%, #5d001e 100%)', 'text' => 'text-danger', 'icon' => 'mdi mdi-book-open-variant', 'color' => 'danger', 'avatarBg' => 'bg-soft-danger'],
+            ['gradient' => 'linear-gradient(135deg, #ef6c00 0%, #e65100 100%)', 'text' => 'text-warning', 'icon' => 'mdi mdi-earth', 'color' => 'warning', 'avatarBg' => 'bg-soft-warning'],
+            ['gradient' => 'linear-gradient(135deg, #3f51b5 0%, #1a237e 100%)', 'text' => 'text-primary', 'icon' => 'mdi mdi-calculator', 'color' => 'blue', 'avatarBg' => 'bg-soft-primary'],
+            ['gradient' => 'linear-gradient(135deg, #6559cc 0%, #4a3fb5 100%)', 'text' => 'text-primary', 'icon' => 'mdi mdi-palette', 'color' => 'blue', 'avatarBg' => 'bg-soft-primary'],
+            ['gradient' => 'linear-gradient(135deg, #00838f 0%, #004d40 100%)', 'text' => 'text-info', 'icon' => 'mdi mdi-run', 'color' => 'info', 'avatarBg' => 'bg-soft-info'],
+            ['gradient' => 'linear-gradient(135deg, #ad1457 0%, #6a1b9a 100%)', 'text' => 'text-danger', 'icon' => 'mdi mdi-music', 'color' => 'danger', 'avatarBg' => 'bg-soft-danger'],
+            ['gradient' => 'linear-gradient(135deg, #f57c00 0%, #e64a19 100%)', 'text' => 'text-warning', 'icon' => 'mdi mdi-cog', 'color' => 'warning', 'avatarBg' => 'bg-soft-warning'],
+        ];
+
+        $mapelId = $tugas->matapelajaran->id ?? 0;
+        $poolIndex = abs(crc32((string) $mapelId)) % count($colorPool);
+        $chosen = $colorPool[$poolIndex];
+
+        $iconClass = $chosen['icon'];
+        $bannerGradient = $chosen['gradient'];
+        $bannerColor = $chosen['color'];
+        $avatarBg = $chosen['avatarBg'];
+        $textColor = $chosen['text'];
 
         $teacherName = $tugas->guru->user->name ?? ($tugas->kelas->guru->user->name ?? 'Guru');
         $namaKelas   = $tugas->kelas->name ?? '-';
@@ -296,7 +289,7 @@
                                 "{{ $submission->feedback_guru }}"
                             </div>
                             <div class="d-flex align-items-center gap-2 mt-2">
-                                <img src="{{ asset('assets/images/users/user-1.jpg') }}" alt="guru" class="rounded-circle" style="width:22px;height:22px;object-fit:cover;">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: #eef2f7; width: 22px; height: 22px;"><i class="mdi mdi-account" style="font-size: 14px; color: #8a9ab0; line-height: 1;"></i></div>
                                 <small class="text-muted font-11">{{ $teacherName }} &bull; {{ $namaMapel }}</small>
                             </div>
                         @else
@@ -353,7 +346,7 @@
                     <h4 class="header-title text-start mb-3">Pengajar</h4>
                     <div class="d-flex align-items-center p-3 bg-light bg-opacity-50 rounded">
                         <div class="rounded-circle overflow-hidden flex-shrink-0" style="width: 46px; height: 46px;">
-                            <img src="{{ asset('assets/images/users/user-1.jpg') }}" alt="teacher" class="img-fluid rounded-circle" style="width:46px;height:46px;object-fit:cover;">
+                            <div class="d-flex align-items-center justify-content-center w-100 h-100" style="background-color: #eef2f7;"><i class="mdi mdi-account" style="font-size: 28px; color: #8a9ab0; line-height: 1;"></i></div>
                         </div>
                         <div class="text-start ms-3">
                             <h5 class="fw-semibold text-dark m-0 font-14">{{ $teacherName }}</h5>

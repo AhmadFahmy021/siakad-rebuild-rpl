@@ -23,20 +23,10 @@
             <div class="card shadow-sm border border-light overflow-hidden">
                 <div class="card-body p-4">
                     <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
-                        <!-- Student Avatar/Initials -->
-                        @php
-                            $words = explode(' ', $siswa->user->name);
-                            $initials = '';
-                            foreach (array_slice($words, 0, 2) as $w) {
-                                $initials .= strtoupper(substr($w, 0, 1));
-                            }
-                            $colors = ['#5b6df0', '#1abc9c', '#f1556c', '#f7b84b', '#4a81d4', '#6559cc'];
-                            $bgColor = $colors[abs(crc32($siswa->id)) % count($colors)];
-                        @endphp
-                        
+                        <!-- Student Avatar/Icon -->
                         <div class="position-relative">
-                            <div class="avatar-xl rounded-circle d-flex align-items-center justify-content-center text-white fw-bold font-24 shadow-sm" style="background-color: {{ $bgColor }}; width: 88px; height: 88px;">
-                                {{ $initials }}
+                            <div class="avatar-xl rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="background-color: #eef2f7; width: 88px; height: 88px;">
+                                <i class="mdi mdi-account" style="font-size: 52px; color: #8a9ab0; line-height: 1;"></i>
                             </div>
                         </div>
 
@@ -88,7 +78,6 @@
                                     <th class="text-center">Score</th>
                                     <th class="text-center">KKM</th>
                                     <th class="text-center">Grade</th>
-                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -115,11 +104,10 @@
                                                 {{ $grade }}
                                             </span>
                                         </td>
-                                        <td class="text-muted font-12 text-wrap" style="max-width: 200px;">{{ $n->remarks }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted py-5">
+                                        <td colspan="4" class="text-center text-muted py-5">
                                             <i class="mdi mdi-notebook-remove font-24 d-block mb-1 text-secondary"></i>
                                             Belum ada nilai terdaftar untuk siswa ini.
                                         </td>

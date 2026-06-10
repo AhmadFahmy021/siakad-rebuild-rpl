@@ -35,7 +35,7 @@ class KonsultasiController extends Controller
         $teacherSubject = $waliKelas ? 'Wali Kelas ' . $className . ' & Guru' : 'Belum Ada Wali Kelas';
         
         $feedbackTitle = $konsultasi->title ?? 'Catatan belum diberikan wali kelas';
-        $feedbackDate = $konsultasi ? \Carbon\Carbon::parse($konsultasi->created_at)->translatedFormat('d F Y') : \Carbon\Carbon::now()->translatedFormat('d F Y');
+        $feedbackDate = $konsultasi ? \Carbon\Carbon::parse($konsultasi->updated_at)->translatedFormat('d F Y') : null;
         $feedbackText = $konsultasi->description ?? 'Belum ada catatan perkembangan yang diberikan oleh wali kelas Anda untuk semester ini.';
 
         return view('siswa.konsultasi', compact(

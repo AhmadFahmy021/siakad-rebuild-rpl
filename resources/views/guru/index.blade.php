@@ -215,7 +215,7 @@
                             <tbody>
                                 <tr>
                                     <td style="width: 36px;">
-                                        <img src="{{ asset('assets') }}/images/users/user-2.jpg" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center avatar-sm mx-auto" style="background-color: #eef2f7;"><i class="mdi mdi-account" style="font-size: 20px; color: #8a9ab0; line-height: 1;"></i></div>
                                     </td>
 
                                     <td>
