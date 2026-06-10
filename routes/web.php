@@ -17,6 +17,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\TataUsahaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GuruAssignmentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +70,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/walas', [DashboardController::class, 'indexWalas'])->name('guru.walas.index');
         Route::get('/walas/siswa/{siswaId}', [DashboardController::class, 'showWalasSiswa'])->name('guru.walas.siswa');
         Route::post('/walas/siswa/{siswaId}/catatan', [DashboardController::class, 'storeWalasCatatan'])->name('guru.walas.catatan.store');
+
+        Route::get('/assignment/{tugas}/grade', [GuruAssignmentController::class, 'gradeList'])->name('assignment.grade');
+        Route::post('/assignment/{tugas}/grade', [GuruAssignmentController::class, 'gradeStore'])->name('assignment.grade.store');
+        Route::resource('/assignment', GuruAssignmentController::class)->names([
+            'index' => 'assignment.index',
+            'create' => 'assignment.create',
+            'store' => 'assignment.store',
+            'edit' => 'assignment.edit',
+            'update' => 'assignment.update',
+            'destroy' => 'assignment.destroy',
+        ]);
     });
 
     Route::prefix('siswa')->middleware(['check.siswa'])->group(function () {

@@ -162,6 +162,15 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{ Request::is('guru/assignment*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ route('assignment.index') }}" class="menu-link {{ Request::is('guru/assignment*') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="check-square"></i>
+                        </span>
+                        <span class="menu-text">Tugas / Assignment</span>
+                    </a>
+                </li>
+
                 @if($isWaliKelas)
                     <li class="menu-item {{ Request::is('guru/walas*') ? 'menuitem-active' : '' }}">
                         <a href="{{ url('guru/walas') }}" class="menu-link {{ Request::is('guru/walas*') ? 'active' : '' }}">
