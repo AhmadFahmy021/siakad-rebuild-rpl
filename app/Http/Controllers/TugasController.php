@@ -26,20 +26,32 @@ class TugasController extends Controller
 
         // If specific task details are requested:
         if ($request->filled('id')) {
-            $tugas = Tugas::whereIn('kelas_id', $kelasIds)
-                ->with(['pengumpulanTugas' => function ($query) use ($siswa) {
-                    $query->where('siswa_id', $siswa->id);
-                }])
+            $tugas = Tugas::where('status', 'PUBLISHED')
+                ->whereIn('kelas_id', $kelasIds)
+                ->with([
+                    'pengumpulanTugas' => function ($query) use ($siswa) {
+                        $query->where('siswa_id', $siswa->id);
+                    },
+                    'kelas',
+                    'matapelajaran',
+                    'guru.user',
+                ])
                 ->findOrFail($request->id);
 
             return view('siswa.tugas_detail', compact('tugas', 'siswa'));
         }
 
         // Otherwise get all assignments
-        $tugasList = Tugas::whereIn('kelas_id', $kelasIds)
-            ->with(['pengumpulanTugas' => function ($query) use ($siswa) {
-                $query->where('siswa_id', $siswa->id);
-            }])
+        $tugasList = Tugas::where('status', 'PUBLISHED')
+            ->whereIn('kelas_id', $kelasIds)
+            ->with([
+                'pengumpulanTugas' => function ($query) use ($siswa) {
+                    $query->where('siswa_id', $siswa->id);
+                },
+                'kelas',
+                'matapelajaran',
+                'guru.user',
+            ])
             ->orderBy('due_date', 'asc')
             ->get();
 
@@ -55,10 +67,11 @@ class TugasController extends Controller
             'file_jawaban' => 'nullable|file|mimes:pdf,zip,rar,doc,docx,png,jpg,jpeg|max:10240', // 10MB
             'link' => 'nullable|url|max:255',
             'catatan' => 'nullable|string|max:1000',
+            'jawaban_teks' => 'nullable|string',
         ]);
 
-        if (!$request->hasFile('file_jawaban') && !$request->filled('link')) {
-            return back()->with('error', 'Harap unggah file jawaban atau sertakan link tautan!');
+        if (!$request->hasFile('file_jawaban') && !$request->filled('link') && !$request->filled('jawaban_teks')) {
+            return back()->with('error', 'Harap unggah file jawaban, sertakan link, atau tulis jawaban teks!');
         }
 
         $siswa = Siswa::where('user_id', Auth::id())->first();
@@ -94,6 +107,7 @@ class TugasController extends Controller
             'file_path' => $filePath,
             'link' => $request->link,
             'catatan' => $request->catatan,
+            'jawaban_teks' => $request->jawaban_teks,
             'status' => 'sudah_mengumpulkan',
         ];
 

@@ -93,46 +93,59 @@
                 <div class="row">
                     @foreach($tugasList as $tugas)
                         @php
-                            $titleLower = strtolower($tugas->title);
-                            $subjectName = 'TUGAS BELAJAR';
                             $iconClass = 'mdi mdi-book-open-page-variant';
                             $bannerGradient = 'linear-gradient(135deg, #5b6df0 0%, #3b4cb8 100%)';
                             $textColor = 'text-blue';
 
-                            if (str_contains($titleLower, 'trigonometri') || str_contains($titleLower, 'matematika') || str_contains($titleLower, 'aljabar') || str_contains($titleLower, 'hitung')) {
-                                $subjectName = 'MATEMATIKA';
+                            $mapelName = $tugas->matapelajaran->nama ?? null;
+                            $mapelLower = strtolower($mapelName ?? '');
+
+                            if (str_contains($mapelLower, 'matematika') || str_contains($mapelLower, 'math')) {
                                 $iconClass = 'mdi mdi-calculator';
                                 $bannerGradient = 'linear-gradient(135deg, #3f51b5 0%, #1a237e 100%)';
                                 $textColor = 'text-primary';
-                            } elseif (str_contains($titleLower, 'reaksi') || str_contains($titleLower, 'asam') || str_contains($titleLower, 'basa') || str_contains($titleLower, 'kimia') || str_contains($titleLower, 'ipa') || str_contains($titleLower, 'praktikum')) {
-                                $subjectName = 'IPA - KIMIA';
+                            } elseif (str_contains($mapelLower, 'kimia') || str_contains($mapelLower, 'fisika') || str_contains($mapelLower, 'biologi') || str_contains($mapelLower, 'ipa')) {
                                 $iconClass = 'mdi mdi-flask-outline';
                                 $bannerGradient = 'linear-gradient(135deg, #00b4db 0%, #0083b0 100%)';
                                 $textColor = 'text-info';
-                            } elseif (str_contains($titleLower, 'cerpen') || str_contains($titleLower, 'bahasa') || str_contains($titleLower, 'indo') || str_contains($titleLower, 'sastra') || str_contains($titleLower, 'unsur')) {
-                                $subjectName = 'BAHASA INDONESIA';
+                            } elseif (str_contains($mapelLower, 'bahasa') || str_contains($mapelLower, 'sastra') || str_contains($mapelLower, 'indonesia') || str_contains($mapelLower, 'inggris')) {
                                 $iconClass = 'mdi mdi-book-open-variant';
                                 $bannerGradient = 'linear-gradient(135deg, #d32f2f 0%, #5d001e 100%)';
                                 $textColor = 'text-danger';
+                            } elseif (str_contains($mapelLower, 'sejarah') || str_contains($mapelLower, 'geografi') || str_contains($mapelLower, 'ips')) {
+                                $iconClass = 'mdi mdi-earth';
+                                $bannerGradient = 'linear-gradient(135deg, #ef6c00 0%, #e65100 100%)';
+                                $textColor = 'text-warning';
+                            } elseif (str_contains($mapelLower, 'komputer') || str_contains($mapelLower, 'informatika') || str_contains($mapelLower, 'tik') || str_contains($mapelLower, 'rpl')) {
+                                $iconClass = 'mdi mdi-laptop';
+                                $bannerGradient = 'linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)';
+                                $textColor = 'text-success';
                             }
 
                             $submission = $tugas->pengumpulanTugas->first();
                             $dueDate = \Carbon\Carbon::parse($tugas->due_date);
                             $isLate = $dueDate->isPast();
                             $remaining = $isLate ? 'Sudah Lewat Deadline' : $dueDate->diffForHumans(null, true) . ' Lagi';
+
+                            $namaKelas = $tugas->kelas->name ?? '-';
+                            $namaMapel = $tugas->matapelajaran->nama ?? 'Tugas Belajar';
+                            $namaGuru = $tugas->guru->user->name ?? '-';
                         @endphp
                         
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card overflow-hidden shadow-sm h-100 border border-light">
                                 
                                 <!-- Card Header Banner -->
-                                <div class="position-relative p-3" style="background: {{$bannerGradient}}; height: 120px;">
-                                    <!-- Floating Subject Tag -->
+                                <div class="position-relative p-3" style="background: {{$bannerGradient}}; height: 110px;">
+                                    <!-- Subject Tag -->
                                     <span class="badge bg-white bg-opacity-25 text-white rounded px-2 py-1 font-11 fw-bold text-uppercase">
-                                        {{ $subjectName }}
+                                        {{ $namaMapel }}
                                     </span>
-                                    
-                                    <!-- Floating Icon circle in the middle border -->
+                                    <!-- Kelas Badge top-right -->
+                                    <span class="position-absolute top-0 end-0 m-2 badge rounded px-2 py-1 font-10 fw-semibold" style="background: rgba(255,255,255,0.92); color: #3a3f5c;">
+                                        <i class="mdi mdi-google-classroom me-1"></i>{{ $namaKelas }}
+                                    </span>
+                                    <!-- Floating Icon -->
                                     <div class="position-absolute end-0 bottom-0 translate-middle-x bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; margin-bottom: -22px; z-index: 2; border: 2px solid #fff;">
                                         <i class="{{ $iconClass }} font-20 {{ $textColor }}"></i>
                                     </div>
@@ -140,9 +153,21 @@
 
                                 <!-- Card Body -->
                                 <div class="card-body pt-4 pb-2">
-                                    <h4 class="mt-0 fw-bold mb-2">
+                                    <h4 class="mt-0 fw-bold mb-1 font-15">
                                         <a href="{{ route('siswa.tugas.index', ['id' => $tugas->id]) }}" class="text-dark hover-primary">{{ $tugas->title }}</a>
                                     </h4>
+
+                                    <!-- Meta info: guru & kelas -->
+                                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                        <span class="text-muted font-12 d-flex align-items-center gap-1">
+                                            <i class="fe-user font-13 text-muted"></i> {{ $namaGuru }}
+                                        </span>
+                                        <span class="text-muted font-12">•</span>
+                                        <span class="badge rounded-pill px-2 py-1 font-10 fw-semibold" style="background: rgba(91,109,240,0.1); color: #5b6df0;">
+                                            <i class="mdi mdi-google-classroom me-1"></i>{{ $namaKelas }}
+                                        </span>
+                                    </div>
+
                                     <p class="text-muted font-13 mb-3 text-overflow-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px;">
                                         {{ $tugas->description }}
                                     </p>
@@ -154,7 +179,7 @@
                                         <span class="text-muted">
                                             <i class="mdi mdi-calendar-clock-outline me-1"></i> {{ $dueDate->translatedFormat('d M Y, H:i') }}
                                         </span>
-                                        <small class="{{ $isLate ? 'text-danger' : 'text-danger' }} fw-semibold">
+                                        <small class="{{ $isLate ? 'text-danger' : 'text-warning' }} fw-semibold">
                                             {{ $remaining }}
                                         </small>
                                     </div>
@@ -178,7 +203,7 @@
                                                 Lihat Nilai <i class="mdi mdi-chevron-right"></i>
                                             </a>
                                         @else
-                                            <a href="{{ route('siswa.tugas.index', ['id' => $tugas->id]) }}" class="btn btn-link p-0 fw-semibold text-blue font-13 text-decoration-none" style="color: #5b6df0 !important;">
+                                            <a href="{{ route('siswa.tugas.index', ['id' => $tugas->id]) }}" class="btn btn-link p-0 fw-semibold font-13 text-decoration-none" style="color: #5b6df0 !important;">
                                                 Buka Tugas <i class="mdi mdi-chevron-right"></i>
                                             </a>
                                         @endif
@@ -188,6 +213,7 @@
                             </div>
                         </div>
                     @endforeach
+
                 </div>
             @endif
         </div>

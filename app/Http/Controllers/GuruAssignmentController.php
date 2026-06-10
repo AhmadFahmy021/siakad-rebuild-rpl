@@ -30,7 +30,7 @@ class GuruAssignmentController extends Controller
     {
         // Get unique kelas_id from schedules
         $kelasIdsFromJadwal = Jadwal::where('guru_id', $guru->id)->pluck('kelas_id')->toArray();
-        $myKelasIds = array_unique(array_merge($kelasIdsFromJadwal, $kelasIdsFromWali));
+        $myKelasIds = array_unique($kelasIdsFromJadwal);
 
         $classes = Kelas::whereIn('id', $myKelasIds)->get();
         if ($classes->isEmpty()) {
@@ -50,6 +50,7 @@ class GuruAssignmentController extends Controller
     {
         $guru = $this->getGuruOrAbort();
         list($classes, $subjects, $myKelasIds) = $this->getClassesAndSubjects($guru);
+        $hasSchedule = Jadwal::where('guru_id', $guru->id)->exists();
 
         // Stats calculation
         $allTeacherTasks = Tugas::where('guru_id', $guru->id)->get();
@@ -74,7 +75,7 @@ class GuruAssignmentController extends Controller
         $totalPossibleSubmissions = 0;
         $actualSubmissions = 0;
         foreach ($publishedTasks as $task) {
-            $studentCount = Siswa::where('kelas_id', $task->kelas_id)->count();
+            $studentCount = Siswa::whereHas('kelas', fn($q) => $q->where('kelas.id', $task->kelas_id))->count();
             $totalPossibleSubmissions += $studentCount;
             $actualSubmissions += $task->pengumpulanTugas()
                 ->whereIn('status', ['sudah_mengumpulkan', 'dinilai'])
@@ -102,13 +103,19 @@ class GuruAssignmentController extends Controller
             'totalActive',
             'totalCompleted',
             'needGrading',
-            'avgSubmissionRate'
+            'avgSubmissionRate',
+            'hasSchedule'
         ));
     }
 
     public function create()
     {
         $guru = $this->getGuruOrAbort();
+        
+        if (!Jadwal::where('guru_id', $guru->id)->exists()) {
+            return redirect()->route('assignment.index')->with('error', 'Anda belum memiliki jadwal mengajar (Mata Pelajaran/Kelas) sehingga tidak dapat membuat tugas.');
+        }
+
         list($classes, $subjects) = $this->getClassesAndSubjects($guru);
 
         return view('guru.assignment.create', compact('classes', 'subjects'));
@@ -117,6 +124,10 @@ class GuruAssignmentController extends Controller
     public function store(Request $request)
     {
         $guru = $this->getGuruOrAbort();
+        
+        if (!Jadwal::where('guru_id', $guru->id)->exists()) {
+            return redirect()->route('assignment.index')->with('error', 'Aksi ditolak. Anda belum memiliki jadwal mengajar.');
+        }
 
         $request->validate([
             'title' => 'required|string|max:150',
@@ -233,7 +244,7 @@ class GuruAssignmentController extends Controller
         $guru = $this->getGuruOrAbort();
         $tugas = Tugas::where('guru_id', $guru->id)->with(['kelas', 'matapelajaran'])->findOrFail($id);
 
-        $students = Siswa::where('kelas_id', $tugas->kelas_id)->with('user')->get();
+        $students = Siswa::whereHas('kelas', fn($q) => $q->where('kelas.id', $tugas->kelas_id))->with('user')->get();
         $submissions = PengumpulanTugas::where('tugas_id', $tugas->id)->get()->keyBy('siswa_id');
 
         $dueLimit = Carbon::parse($tugas->due_date);
@@ -251,6 +262,7 @@ class GuruAssignmentController extends Controller
             $file = null;
             $link = null;
             $catatan = null;
+            $jawaban_teks = null;
             $nilaiVal = null;
             $submittedAt = null;
 
@@ -259,6 +271,7 @@ class GuruAssignmentController extends Controller
                 $file = $submission->file_path;
                 $link = $submission->link;
                 $catatan = $submission->catatan;
+                $jawaban_teks = $submission->jawaban_teks;
                 $nilaiVal = $submission->nilai;
                 $submittedAt = $submission->created_at;
 
@@ -272,8 +285,8 @@ class GuruAssignmentController extends Controller
                     $turnedInCount++;
                 }
 
-                // Check if submitted late
-                if ($submittedAt && Carbon::parse($submittedAt)->greaterThan($dueLimit)) {
+                // Check if submitted late (don't overwrite GRADED status)
+                if ($submittedAt && Carbon::parse($submittedAt)->greaterThan($dueLimit) && $status !== 'GRADED') {
                     $status = 'LATE';
                     $lateCount++;
                 }
@@ -286,14 +299,15 @@ class GuruAssignmentController extends Controller
             }
 
             $studentsGradingList[] = (object) [
-                'siswa_id' => $student->id,
-                'name' => $student->user->name ?? 'Siswa',
-                'nisn' => $student->nisn ?? '-',
-                'status' => $status,
-                'file' => $file,
-                'link' => $link,
-                'catatan' => $catatan,
-                'nilai' => $nilaiVal,
+                'siswa_id'     => $student->id,
+                'name'         => $student->user->name ?? 'Siswa',
+                'nisn'         => $student->nisn ?? '-',
+                'status'       => $status,
+                'file'         => $file,
+                'link'         => $link,
+                'catatan'      => $catatan,
+                'jawaban_teks' => $jawaban_teks ?? null,
+                'nilai'        => $nilaiVal,
                 'submitted_at' => $submittedAt ? Carbon::parse($submittedAt)->translatedFormat('d M Y, H:i') : null
             ];
         }
@@ -403,5 +417,66 @@ class GuruAssignmentController extends Controller
                 ]
             );
         }
+    }
+
+    public function gradeDetail($tugasId, $siswaId)
+    {
+        $guru  = $this->getGuruOrAbort();
+        $tugas = Tugas::where('guru_id', $guru->id)
+            ->with(['kelas', 'matapelajaran'])
+            ->findOrFail($tugasId);
+
+        $siswa = Siswa::with('user')->findOrFail($siswaId);
+
+        $submission = PengumpulanTugas::where('tugas_id', $tugas->id)
+            ->where('siswa_id', $siswa->id)
+            ->first();
+
+        return view('guru.assignment.grade_detail', compact('tugas', 'siswa', 'submission'));
+    }
+
+    public function gradeDetailStore(Request $request, $tugasId, $siswaId)
+    {
+        $guru  = $this->getGuruOrAbort();
+        $tugas = Tugas::where('guru_id', $guru->id)->findOrFail($tugasId);
+        $siswa = Siswa::findOrFail($siswaId);
+
+        $request->validate([
+            'nilai'    => 'required|integer|min:0|max:' . $tugas->max_score,
+            'feedback' => 'nullable|string|max:2000',
+            'action'   => 'required|in:save_draft,release',
+        ]);
+
+        $submission = PengumpulanTugas::firstOrNew([
+            'tugas_id' => $tugas->id,
+            'siswa_id' => $siswa->id,
+        ]);
+
+        $submission->nilai        = $request->nilai;
+        $submission->feedback_guru = $request->feedback;
+
+        if ($request->action === 'release') {
+            $submission->status = 'dinilai';
+        } else {
+            if ($submission->status !== 'dinilai') {
+                $submission->status = ($submission->file_path || $submission->link || $submission->jawaban_teks)
+                    ? 'sudah_mengumpulkan'
+                    : 'belum_mengumpulkan';
+            }
+        }
+
+        $submission->save();
+
+        if ($request->action === 'release') {
+            $this->syncStudentOverallGrade($siswa->id, $tugas->matapelajaran_id, $tugas->kelas_id);
+        }
+
+        $msg = $request->action === 'release'
+            ? 'Nilai berhasil dirilis ke siswa.'
+            : 'Draft nilai berhasil disimpan.';
+
+        return redirect()
+            ->route('assignment.grade', $tugas->id)
+            ->with('success', $msg);
     }
 }

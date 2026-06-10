@@ -230,12 +230,24 @@
                         <div class="d-flex flex-column gap-3">
                             @foreach($upcomingTasks as $t)
                                 @php
-                                    $subjTag = 'Tugas';
-                                    $tagColor = 'bg-secondary';
+                                    $subjTag = $t->matapelajaran ? $t->matapelajaran->nama : 'Tugas';
+                                    $tagColor = 'bg-primary';
 
                                     $dueDate = \Carbon\Carbon::parse($t->due_date);
-                                    $remDays = $dueDate->diffInDays(\Carbon\Carbon::now());
-                                    $remDaysText = $remDays == 0 ? 'Hari Ini' : ($remDays + 1) . ' Hari Lagi';
+                                    $now = \Carbon\Carbon::now();
+                                    
+                                    if ($now->greaterThan($dueDate)) {
+                                        $remDaysText = 'Terlewat';
+                                    } else {
+                                        $daysRemaining = intval($now->copy()->startOfDay()->diffInDays($dueDate->copy()->startOfDay(), false));
+                                        if ($daysRemaining == 0) {
+                                            $remDaysText = 'Hari Ini';
+                                        } elseif ($daysRemaining == 1) {
+                                            $remDaysText = 'Besok';
+                                        } else {
+                                            $remDaysText = $daysRemaining . ' Hari Lagi';
+                                        }
+                                    }
                                 @endphp
                                 
                                 <div class="border rounded p-3 bg-light bg-opacity-25" style="border: 1px solid #eef2f7 !important;">

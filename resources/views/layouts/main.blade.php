@@ -128,10 +128,7 @@
         <script src="{{ asset('assets') }}/js/pages/datatables.init.js"></script>
 
         <!-- Sweet Alerts js -->
-        {{-- <script src="{{ asset('assets') }}/libs/sweetalert2/sweetalert2.all.min.js"></script>
-
-        <!-- Sweet alert init js-->
-        <script src="{{ asset('assets') }}/js/pages/sweet-alerts.init.js"></script> --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             document.addEventListener('click', function(event) {
 
@@ -143,10 +140,11 @@
                     event.preventDefault();
 
                     let nama = confirmDeleteElement.dataset.name;
+                    let customText = confirmDeleteElement.dataset.text || 'Apakah yakin ingin menghapus "' + nama + '" ?';
 
                     Swal.fire({
                         title: 'Hapus Data?',
-                        text: 'Apakah yakin ingin menghapus "' + nama + '" ?',
+                        text: customText,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Ya, Hapus!',

@@ -142,7 +142,7 @@
                                 @forelse($assignments as $assignment)
                                     @php
                                         // Calculations for submissions progress
-                                        $totalStudents = \App\Models\Siswa::where('kelas_id', $assignment->kelas_id)->count();
+                                        $totalStudents = \App\Models\Siswa::whereHas('kelas', fn($q) => $q->where('kelas.id', $assignment->kelas_id))->count();
                                         $submittedCount = $assignment->pengumpulanTugas->whereIn('status', ['sudah_mengumpulkan', 'dinilai'])->count();
                                         $percent = $totalStudents > 0 ? round(($submittedCount / $totalStudents) * 100) : 0;
                                         
@@ -204,7 +204,7 @@
                                                 <a href="{{ route('assignment.edit', $assignment->id) }}" class="action-icon text-muted hover-primary p-1" title="Edit Assignment">
                                                     <i class="mdi mdi-square-edit-outline font-18"></i>
                                                 </a>
-                                                <a href="{{ route('assignment.destroy', $assignment->id) }}" class="action-icon text-muted text-danger p-1" title="Delete Assignment" data-confirm-delete2="true" data-name="{{ $assignment->title }}">
+                                                <a href="{{ route('assignment.destroy', $assignment->id) }}" class="action-icon text-muted text-danger p-1" title="Delete Assignment" data-confirm-delete2="true" data-name="{{ $assignment->title }}" data-text="Apakah yakin ingin menghapus '{{ $assignment->title }}'? Peringatan: Data nilai dan pengumpulan siswa untuk tugas ini juga akan ikut terhapus.">
                                                     <i class="mdi mdi-delete-outline font-18 text-danger"></i>
                                                 </a>
                                             </div>
@@ -241,9 +241,15 @@
     <!-- Create Assignment Sticky/Footer Button -->
     <div class="row mt-2">
         <div class="col-12">
-            <a href="{{ route('assignment.create') }}" class="btn btn-primary bg-gradient-primary rounded font-13 px-4 py-2" style="background-color: #5b6df0; border-color: #5b6df0;">
-                <i class="mdi mdi-plus me-1"></i> Create New Assignment
-            </a>
+            @if($hasSchedule)
+                <a href="{{ route('assignment.create') }}" class="btn btn-primary bg-gradient-primary rounded font-13 px-4 py-2" style="background-color: #5b6df0; border-color: #5b6df0;">
+                    <i class="mdi mdi-plus me-1"></i> Create New Assignment
+                </a>
+            @else
+                <div class="alert alert-warning text-center border-warning" role="alert">
+                    <i class="mdi mdi-alert-circle-outline me-1"></i> Anda tidak dapat membuat tugas baru karena Anda belum memiliki jadwal mengajar yang di-assign oleh Admin/TU.
+                </div>
+            @endif
         </div>
     </div>
 

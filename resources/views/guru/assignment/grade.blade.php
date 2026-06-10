@@ -103,140 +103,148 @@
             </div>
         </div>
 
-        <!-- Student Submissions Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow-sm border border-light">
-                    <div class="card-body">
-                        <!-- Table Title & Tab filters -->
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 pb-2 border-bottom">
-                            <h4 class="header-title text-dark fw-bold m-0 font-15">Submission List</h4>
-                            
-                            <div class="d-flex gap-2">
-                                <!-- Tabs navigation -->
-                                <div class="btn-group btn-group-sm rounded-pill" style="border: 1px solid #e2e8f0; padding: 2px; background-color: #f8f9fa;">
-                                    <a href="{{ route('assignment.grade', ['tugas' => $tugas->id, 'tab' => 'all']) }}" class="btn rounded-pill font-11 px-3 {{ $tab === 'all' ? 'btn-white shadow-sm text-dark fw-bold' : 'btn-light text-muted border-0 bg-transparent' }}">All</a>
-                                    <a href="{{ route('assignment.grade', ['tugas' => $tugas->id, 'tab' => 'ungraded']) }}" class="btn rounded-pill font-11 px-3 {{ $tab === 'ungraded' ? 'btn-white shadow-sm text-dark fw-bold' : 'btn-light text-muted border-0 bg-transparent' }}">Ungraded</a>
-                                    <a href="{{ route('assignment.grade', ['tugas' => $tugas->id, 'tab' => 'missing']) }}" class="btn rounded-pill font-11 px-3 {{ $tab === 'missing' ? 'btn-white shadow-sm text-dark fw-bold' : 'btn-light text-muted border-0 bg-transparent' }}">Missing</a>
-                                </div>
+    <!-- Student Submissions Card -->
+    <div class="row">
+        <div class="col-12">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show font-13" role="alert">
+                    <i class="mdi mdi-check-circle me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+            <div class="card shadow-sm border border-light">
+                <div class="card-body">
+                    <!-- Table Title & Tab filters -->
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 pb-2 border-bottom">
+                        <h4 class="header-title text-dark fw-bold m-0 font-15">Submission List</h4>
+                        <div class="d-flex gap-2">
+                            <div class="btn-group btn-group-sm rounded-pill" style="border: 1px solid #e2e8f0; padding: 2px; background-color: #f8f9fa;">
+                                <a href="{{ route('assignment.grade', ['tugas' => $tugas->id, 'tab' => 'all']) }}" class="btn rounded-pill font-11 px-3 {{ $tab === 'all' ? 'btn-white shadow-sm text-dark fw-bold' : 'btn-light text-muted border-0 bg-transparent' }}">All</a>
+                                <a href="{{ route('assignment.grade', ['tugas' => $tugas->id, 'tab' => 'ungraded']) }}" class="btn rounded-pill font-11 px-3 {{ $tab === 'ungraded' ? 'btn-white shadow-sm text-dark fw-bold' : 'btn-light text-muted border-0 bg-transparent' }}">Ungraded</a>
+                                <a href="{{ route('assignment.grade', ['tugas' => $tugas->id, 'tab' => 'missing']) }}" class="btn rounded-pill font-11 px-3 {{ $tab === 'missing' ? 'btn-white shadow-sm text-dark fw-bold' : 'btn-light text-muted border-0 bg-transparent' }}">Missing</a>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Submissions Table -->
-                        <div class="table-responsive">
-                            <table class="table table-hover table-centered align-middle mb-0 font-13" style="border-color: #e5e8eb !important;">
-                                <thead class="table-light">
-                                    <tr class="text-uppercase text-muted font-10 tracking-wider" style="letter-spacing: 0.5px;">
-                                        <th style="width: 5%" class="text-center">No</th>
-                                        <th style="width: 30%">Student Name</th>
-                                        <th style="width: 15%" class="text-center">Status</th>
-                                        <th style="width: 18%">File / Link</th>
-                                        <th style="width: 12%">Score (Max: {{ $tugas->max_score }})</th>
-                                        <th style="width: 20%">Feedback</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php $no = 1; @endphp
-                                    @forelse($studentsGradingList as $record)
-                                        @php
-                                            // Status tag styles matching mockup
-                                            $statusText = $record->status;
-                                            $statusClass = 'bg-soft-secondary text-secondary';
-                                            
-                                            if ($record->status === 'SUBMITTED') {
-                                                $statusClass = 'bg-soft-success text-success';
-                                            } elseif ($record->status === 'GRADED') {
-                                                $statusClass = 'bg-success text-white';
-                                            } elseif ($record->status === 'LATE') {
-                                                $statusClass = 'bg-soft-warning text-warning';
-                                            } elseif ($record->status === 'MISSING') {
-                                                $statusClass = 'bg-soft-danger text-danger';
-                                            }
-                                            
-                                            // Initials for avatar
-                                            $words = explode(" ", $record->name);
-                                            $initials = "";
-                                            foreach ($words as $w) {
-                                                $initials .= strtoupper(substr($w, 0, 1));
-                                                if(strlen($initials) >= 2) break;
-                                            }
-                                        @endphp
-                                        <tr>
-                                            <!-- NO -->
-                                            <td class="text-center text-muted font-12">{{ sprintf("%02d", $no++) }}</td>
-                                            
-                                            <!-- STUDENT NAME -->
-                                            <td>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-blue fw-bold font-12 bg-soft-blue shadow-sm" style="width: 32px; height: 32px; background-color: rgba(91, 109, 240, 0.12) !important; color: #5b6df0 !important;">
-                                                        {{ $initials }}
-                                                    </div>
-                                                    <div>
-                                                        <span class="d-block fw-bold text-dark font-13 mb-0">{{ $record->name }}</span>
-                                                        <small class="text-muted font-11">NISN: {{ $record->nisn }}</small>
-                                                    </div>
+                    <!-- Submissions Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-centered align-middle mb-0 font-13" style="border-color: #e5e8eb !important;">
+                            <thead class="table-light">
+                                <tr class="text-uppercase text-muted font-10 tracking-wider" style="letter-spacing: 0.5px;">
+                                    <th style="width: 5%" class="text-center">No</th>
+                                    <th style="width: 32%">Student Name</th>
+                                    <th style="width: 15%" class="text-center">Status</th>
+                                    <th style="width: 18%">Jawaban</th>
+                                    <th style="width: 12%" class="text-center">Nilai</th>
+                                    <th style="width: 18%" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $no = 1; @endphp
+                                @forelse($studentsGradingList as $record)
+                                    @php
+                                        $statusClass = 'bg-soft-secondary text-secondary';
+                                        if ($record->status === 'SUBMITTED')     $statusClass = 'bg-soft-success text-success';
+                                        elseif ($record->status === 'GRADED')    $statusClass = 'bg-success text-white';
+                                        elseif ($record->status === 'LATE')      $statusClass = 'bg-soft-warning text-warning';
+                                        elseif ($record->status === 'MISSING')   $statusClass = 'bg-soft-danger text-danger';
+                                        elseif ($record->status === 'NOT STARTED') $statusClass = 'bg-soft-secondary text-muted';
+
+                                        $words = explode(" ", $record->name);
+                                        $initials = "";
+                                        foreach ($words as $w) {
+                                            $initials .= strtoupper(substr($w, 0, 1));
+                                            if(strlen($initials) >= 2) break;
+                                        }
+
+                                        $hasAnswer = $record->file || $record->link || isset($record->jawaban_teks) && $record->jawaban_teks;
+                                    @endphp
+                                    <tr>
+                                        <!-- NO -->
+                                        <td class="text-center text-muted font-12">{{ sprintf("%02d", $no++) }}</td>
+
+                                        <!-- STUDENT NAME (clickable) -->
+                                        <td>
+                                            <a href="{{ route('assignment.grade.detail', [$tugas->id, $record->siswa_id]) }}" class="d-flex align-items-center gap-2 text-decoration-none hover-primary">
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold font-12" style="width: 34px; height: 34px; background-color: rgba(91,109,240,0.12); color: #5b6df0; flex-shrink:0;">
+                                                    {{ $initials }}
                                                 </div>
-                                            </td>
+                                                <div>
+                                                    <span class="d-block fw-semibold text-dark font-13 mb-0">{{ $record->name }}</span>
+                                                    <small class="text-muted font-11">NISN: {{ $record->nisn }}</small>
+                                                </div>
+                                            </a>
+                                        </td>
 
-                                            <!-- STATUS -->
-                                            <td class="text-center">
-                                                <span class="badge {{ $statusClass }} font-10 px-2 py-0-5 rounded">
-                                                    {{ $statusText }}
-                                                </span>
-                                            </td>
+                                        <!-- STATUS -->
+                                        <td class="text-center">
+                                            <span class="badge {{ $statusClass }} font-10 px-2 py-1 rounded">
+                                                {{ $record->status }}
+                                            </span>
+                                        </td>
 
-                                            <!-- FILE / LINK -->
-                                            <td>
+                                        <!-- JAWABAN INDICATOR -->
+                                        <td>
+                                            <div class="d-flex flex-column gap-1">
                                                 @if($record->file)
-                                                    <a href="{{ asset('storage/' . $record->file) }}" target="_blank" class="text-blue fw-semibold text-decoration-none font-12 d-flex align-items-center gap-1 hover-primary" title="Click to view file">
-                                                        <i class="fe-file-text font-14"></i> {{ basename($record->file) }}
-                                                    </a>
+                                                    <span class="font-11 text-success d-flex align-items-center gap-1">
+                                                        <i class="fe-file-text"></i> File
+                                                    </span>
                                                 @endif
                                                 @if($record->link)
-                                                    <a href="{{ $record->link }}" target="_blank" class="text-info fw-semibold text-decoration-none font-12 d-flex align-items-center gap-1 hover-primary" title="Open external link">
-                                                        <i class="fe-external-link font-14"></i> View Submission Link
-                                                    </a>
+                                                    <span class="font-11 text-info d-flex align-items-center gap-1">
+                                                        <i class="fe-link"></i> Link
+                                                    </span>
                                                 @endif
-                                                @if(!$record->file && !$record->link)
-                                                    <span class="text-muted font-12">No file submitted</span>
+                                                @if(isset($record->jawaban_teks) && $record->jawaban_teks)
+                                                    <span class="font-11 text-primary d-flex align-items-center gap-1">
+                                                        <i class="mdi mdi-text-box-outline"></i> Teks
+                                                    </span>
                                                 @endif
-
-                                                <!-- Collapsible/popup Student Note -->
-                                                @if($record->catatan)
-                                                    <div class="mt-1 font-11 bg-light bg-opacity-25 rounded p-1-5 text-muted border text-overflow-3" style="font-style: italic; line-height: 1.3;" title="Catatan Siswa: {{ $record->catatan }}">
-                                                        <strong>Note:</strong> "{{ $record->catatan }}"
-                                                    </div>
+                                                @if(!$hasAnswer)
+                                                    <span class="text-muted font-11">—</span>
                                                 @endif
-                                            </td>
+                                            </div>
+                                        </td>
 
-                                            <!-- SCORE INPUT -->
-                                            <td>
-                                                <div class="input-group input-group-sm" style="width: 80px;">
-                                                    <input type="number" name="grades[{{ $record->siswa_id }}]" class="form-control text-center font-13 fw-semibold border rounded-start" value="{{ $record->nilai }}" min="0" max="{{ $tugas->max_score }}" placeholder="0" style="padding: 0.25rem 0.5rem;">
-                                                </div>
-                                            </td>
+                                        <!-- NILAI -->
+                                        <td class="text-center">
+                                            @if($record->nilai !== null)
+                                                <span class="fw-bold font-15 {{ $record->nilai >= ($tugas->kkm ?? 75) ? 'text-success' : 'text-danger' }}">
+                                                    {{ $record->nilai }}
+                                                </span>
+                                                <span class="text-muted font-11">/{{ $tugas->max_score }}</span>
+                                            @else
+                                                <span class="text-muted font-12">—</span>
+                                            @endif
+                                        </td>
 
-                                            <!-- FEEDBACK INPUT -->
-                                            <td>
-                                                <input type="text" name="feedbacks[{{ $record->siswa_id }}]" class="form-control form-control-sm border" value="{{ $record->catatan }}" placeholder="Add feedback..." style="font-size: 12px; border-radius: 4px;">
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="text-center text-muted py-5">
-                                                <i class="fe-user font-28 d-block mb-2 text-secondary"></i>
-                                                Tidak ada data siswa ditemukan untuk kelas ini.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                        <!-- AKSI -->
+                                        <td class="text-center">
+                                            <a href="{{ route('assignment.grade.detail', [$tugas->id, $record->siswa_id]) }}"
+                                               class="btn btn-sm font-12 px-3 py-1 rounded"
+                                               style="{{ $record->status === 'GRADED' ? 'background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7;' : 'background:rgba(91,109,240,0.1); color:#5b6df0; border:1px solid #c5caf8;' }}">
+                                                <i class="mdi mdi-{{ $record->status === 'GRADED' ? 'eye' : 'pencil' }} me-1"></i>
+                                                {{ $record->status === 'GRADED' ? 'Lihat Nilai' : 'Beri Nilai' }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-5">
+                                            <i class="fe-user font-28 d-block mb-2 text-secondary"></i>
+                                            Tidak ada data siswa ditemukan untuk kelas ini.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
+
     
     <style>
         .hover-primary:hover {

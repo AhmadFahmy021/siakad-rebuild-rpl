@@ -94,7 +94,7 @@ class DashboardController extends Controller
         $rataRataNilai = $countNilai > 0 ? ($totalNilai / $countNilai) : 0;
 
         // 2. Calculate Tugas Stats
-        $totalTugas = $kelasId ? Tugas::where('kelas_id', $kelasId)->count() : 0;
+        $totalTugas = $kelasId ? Tugas::where('kelas_id', $kelasId)->where('status', 'PUBLISHED')->count() : 0;
 
         $selesaiTugas = PengumpulanTugas::where('siswa_id', $siswa->id)
             ->where(function ($query) {
@@ -109,6 +109,7 @@ class DashboardController extends Controller
         if ($kelasId) {
             $now = \Carbon\Carbon::now();
             $upcomingTasksRaw = Tugas::where('kelas_id', $kelasId)
+                ->where('status', 'PUBLISHED')
                 ->where('due_date', '>', $now)
                 ->get();
 
@@ -174,7 +175,9 @@ class DashboardController extends Controller
         $upcomingTasks = collect();
         if ($kelasId) {
             $now = \Carbon\Carbon::now();
-            $upcomingTasks = Tugas::where('kelas_id', $kelasId)
+            $upcomingTasks = Tugas::with('matapelajaran')
+                ->where('kelas_id', $kelasId)
+                ->where('status', 'PUBLISHED')
                 ->where('due_date', '>', $now)
                 ->orderBy('due_date', 'asc')
                 ->get()
@@ -251,7 +254,8 @@ class DashboardController extends Controller
             'months',
             'pembayaranData',
             'kelas',
-            'kelasStats'
+            'kelasStats',
+            'totalKelas'
         ));
     }
 
@@ -387,7 +391,7 @@ class DashboardController extends Controller
 
         // Get students in this class
         $students = Siswa::whereHas('kelas', function ($query) use ($kelas) {
-            $query->where('kelas_id', $kelas->id);
+            $query->where('kelas.id', $kelas->id);
         })->with('user')->get();
 
         // Calculate average grade
@@ -431,7 +435,7 @@ class DashboardController extends Controller
 
         // Calculate class rank
         $allClassStudents = Siswa::whereHas('kelas', function ($query) use ($kelas) {
-            $query->where('kelas_id', $kelas->id);
+            $query->where('kelas.id', $kelas->id);
         })->get();
 
         $studentIds = $allClassStudents->pluck('id');

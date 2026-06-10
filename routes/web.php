@@ -71,6 +71,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/assignment/{tugas}/grade', [GuruAssignmentController::class, 'gradeList'])->name('assignment.grade');
         Route::post('/assignment/{tugas}/grade', [GuruAssignmentController::class, 'gradeStore'])->name('assignment.grade.store');
+        Route::get('/assignment/{tugas}/grade/{siswa}', [GuruAssignmentController::class, 'gradeDetail'])->name('assignment.grade.detail');
+        Route::post('/assignment/{tugas}/grade/{siswa}', [GuruAssignmentController::class, 'gradeDetailStore'])->name('assignment.grade.detail.store');
         Route::resource('/assignment', GuruAssignmentController::class)->names([
             'index' => 'assignment.index',
             'create' => 'assignment.create',
