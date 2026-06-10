@@ -22,7 +22,7 @@
 
         <!-- User box -->
         <div class="user-box text-center">
-            <img src="{{ asset('assets') }}/images/users/user-1.jpg" alt="user-img" title="Mat Helme" class="rounded-circle avatar-md">
+            <div class="rounded-circle d-flex align-items-center justify-content-center avatar-md mx-auto" style="background-color: #eef2f7;"><i class="mdi mdi-account" style="font-size: 32px; color: #8a9ab0; line-height: 1;"></i></div>
             <div class="dropdown">
                 <a href="javascript: void(0);" class="dropdown-toggle h5 mb-1 d-block" data-bs-toggle="dropdown">Geneva Kennedy</a>
                 <div class="dropdown-menu user-pro-dropdown">

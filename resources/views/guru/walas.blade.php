@@ -72,17 +72,6 @@
                             <tbody>
                                 @forelse($students as $idx => $student)
                                     @php
-                                        // Initials Generation
-                                        $words = explode(' ', $student->user->name);
-                                        $initials = '';
-                                        foreach (array_slice($words, 0, 2) as $w) {
-                                            $initials .= strtoupper(substr($w, 0, 1));
-                                        }
-
-                                        // Deterministic Initial Color Coding
-                                        $colors = ['#5b6df0', '#1abc9c', '#f1556c', '#f7b84b', '#4a81d4', '#6559cc'];
-                                        $bgColor = $colors[abs(crc32($student->id)) % count($colors)];
-
                                         // Grade Badge Color Class
                                         $avgGrade = $student->rata_rata_nilai;
                                         if ($avgGrade >= 85) {
@@ -99,12 +88,12 @@
                                         <!-- No -->
                                         <td class="text-center font-14 text-muted fw-semibold">{{ sprintf("%02d", $idx + 1) }}</td>
                                         
-                                        <!-- Student Profile & Initials -->
-                                        <td class="text-start">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center text-white fw-bold font-13" style="background-color: {{ $bgColor }}; width: 36px; height: 36px; min-width: 36px;">
-                                                    {{ $initials }}
-                                                </div>
+                                        <!-- Student Profile & Icon -->
+                                         <td class="text-start">
+                                             <div class="d-flex align-items-center gap-3">
+                                                 <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: #eef2f7; width: 36px; height: 36px; min-width: 36px;">
+                                                     <i class="mdi mdi-account" style="font-size: 22px; color: #8a9ab0; line-height: 1;"></i>
+                                                 </div>
                                                 <div>
                                                     <span class="d-block fw-bold text-dark font-14">{{ $student->user->name }}</span>
                                                 </div>

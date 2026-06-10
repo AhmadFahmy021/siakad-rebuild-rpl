@@ -18,9 +18,11 @@
             <div class="card overflow-hidden border border-light shadow-sm">
                 <!-- Card Header -->
                 <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center pt-3 pb-0">
-                    <span class="badge bg-soft-blue text-blue rounded px-2 py-1 font-11 fw-bold text-uppercase" style="background-color: rgba(91, 109, 240, 0.12) !important; color: #5b6df0 !important;">
-                        Tanggal Diberikan: {{ $feedbackDate }}
-                    </span>
+                    @if($feedbackDate)
+                        <span class="badge bg-soft-blue text-blue rounded px-2 py-1 font-11 fw-bold text-uppercase" style="background-color: rgba(91, 109, 240, 0.12) !important; color: #5b6df0 !important;">
+                            Tanggal Diberikan: {{ $feedbackDate }}
+                        </span>
+                    @endif
                 </div>
 
                 <div class="card-body pt-1">
@@ -92,7 +94,7 @@
                     
                     <div class="position-relative d-inline-block mx-auto mb-3">
                         <div class="rounded overflow-hidden" style="width: 80px; height: 80px;">
-                            <img src="{{ asset('assets/images/users/user-4.jpg') }}" alt="Wali Kelas" class="img-fluid">
+                            <div class="d-flex align-items-center justify-content-center w-100 h-100" style="background-color: #eef2f7;"><i class="mdi mdi-account" style="font-size: 48px; color: #8a9ab0; line-height: 1;"></i></div>
                         </div>
                         <span class="position-absolute bottom-0 end-0 bg-success border border-white border-2 rounded-circle" style="width: 14px; height: 14px; display: inline-block;"></span>
                     </div>

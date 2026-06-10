@@ -21,14 +21,12 @@
         </div>
     </div>
 
-    <!-- Main Grading Form Wrapper -->
-    <form action="{{ route('assignment.grade.store', $tugas->id) }}" method="POST">
-        @csrf
+    <!-- Grading Header Cards -->
         
         <!-- Grading Header Cards & Actions -->
         <div class="row mt-2">
             <!-- Stats Columns -->
-            <div class="col-lg-8">
+            <div class="col-12">
                 <div class="row">
                     <!-- Turned In -->
                     <div class="col-md-3 col-6 mb-3">
@@ -92,15 +90,7 @@
                 </div>
             </div>
 
-            <!-- Action buttons column -->
-            <div class="col-lg-4 d-flex align-items-center justify-content-end gap-2 mb-3">
-                <button type="submit" name="action" value="save_draft" class="btn btn-outline-primary font-13 px-3 py-1-5 border" style="border-color: #5b6df0; color: #5b6df0;">
-                    <i class="mdi mdi-content-save-outline me-1"></i> Save Draft
-                </button>
-                <button type="submit" name="action" value="release" class="btn btn-primary font-13 px-4 py-1-5 bg-gradient-primary" style="background-color: #5b6df0; border-color: #5b6df0;">
-                    <i class="mdi mdi-send-outline me-1"></i> Release Scores
-                </button>
-            </div>
+
         </div>
 
     <!-- Student Submissions Card -->

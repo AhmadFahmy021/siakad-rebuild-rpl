@@ -27,7 +27,7 @@
             <!-- User Dropdown -->
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                    <img src="{{ asset('assets') }}/images/users/user-1.jpg" alt="user-image" class="rounded-circle">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: #eef2f7; width: 32px; height: 32px;"><i class="mdi mdi-account" style="font-size: 20px; color: #8a9ab0; line-height: 1;"></i></div>
                     @auth
                         <span class="ms-1 d-none d-md-inline-block">
                             {{ Auth::user()->name }} <i class="mdi mdi-chevron-down"></i>

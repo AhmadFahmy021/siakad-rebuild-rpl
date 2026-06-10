@@ -168,7 +168,8 @@
 
         <!-- RIGHT: Grading Panel -->
         <div class="col-lg-4">
-            <div class="card shadow-sm border border-light" style="position: sticky; top: 80px;">
+            <div style="position: sticky; top: 80px;">
+                <div class="card shadow-sm border border-light">
                 <div class="card-body">
                     <h4 class="header-title mb-4 d-flex align-items-center gap-2">
                         <i class="mdi mdi-star-circle-outline font-18" style="color:#5b6df0;"></i>
@@ -305,6 +306,8 @@
                     </div>
                 </div>
             </div>
+            
+            </div> <!-- End Sticky Wrapper -->
         </div>
     </div>
 
