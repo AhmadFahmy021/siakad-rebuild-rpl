@@ -20,14 +20,14 @@
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $jumlahTagihan }}</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Jumlah Tagihan</p>
+                                <h3 class="text-dark mt-1"><span data-counter data-value="{{ $jumlahTagihan }}">{{ $jumlahTagihan }}</span></h3>
+                                <p class="text-muted mb-1 text-truncate" title="Jumlah Tagihan">Jumlah Tagihan</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
 
         <div class="col-md-6 col-xl-3">
             <div class="widget-rounded-circle card">
@@ -40,8 +40,8 @@
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalUangMasuk }}</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Total Uang Masuk</p>
+                                <h3 class="text-dark mt-1">Rp. <span data-counter data-value="{{ $totalUangMasuk }}">{{ $totalUangMasuk }}</span></h3>
+                                <p class="text-muted mb-1 text-truncate" title="Total Uang Masuk">Total Uang Masuk</p>
                             </div>
                         </div>
                     </div>
@@ -60,8 +60,8 @@
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $pembayaranPending }}</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Pembayaran Pending</p>
+                                <h3 class="text-dark mt-1"><span data-counter data-value="{{ $pembayaranPending }}">{{ $pembayaranPending }}</span></h3>
+                                <p class="text-muted mb-1 text-truncate" title="Pembayaran Pending">Pembayaran Pending</p>
                             </div>
                         </div>
                     </div>
@@ -80,8 +80,8 @@
                         </div>
                         <div class="col-6">
                             <div class="text-end">
-                                <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $kelas->count() }}</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Total Kelas</p>
+                                <h3 class="text-dark mt-1"><span data-counter data-value="{{ $totalKelas }}">{{ $totalKelas }}</span></h3>
+                                <p class="text-muted mb-1 text-truncate" title="Total Kelas">Total Kelas</p>
                             </div>
                         </div>
                     </div>
@@ -199,29 +199,27 @@
             };
             new ApexCharts(document.querySelector("#payment-status-chart"), paymentStatusOptions).render();
 
-            // Counter animation formatting to Indonesian format (with dots)
-            $('[data-plugin="counterup"]').each(function() {
+            // Counter animation — baca dari data-value, pakai data-counter agar tidak bentrok dengan plugin bawaan template
+            $('[data-counter]').each(function() {
                 var $this = $(this),
-                    from = parseInt($this.attr('data-from'), 10) || 0,
-                    to = parseInt($this.text(), 10),
+                    to = parseInt($this.attr('data-value'), 10) || 0,
+                    from = 0,
                     speed = 1500,
                     refreshInterval = 50,
-                    increase = (to - from) / (speed / refreshInterval);
+                    steps = speed / refreshInterval,
+                    increase = to / steps;
 
                 var loopCount = 0,
-                    checkMax = speed / refreshInterval,
                     current = from;
 
                 var interval = setInterval(function() {
                     current += increase;
                     loopCount++;
-                    if (loopCount >= checkMax) {
+                    if (loopCount >= steps) {
                         current = to;
-                    }
-                    $this.text(Math.floor(current).toLocaleString('id-ID'));
-                    if (loopCount >= checkMax) {
                         clearInterval(interval);
                     }
+                    $this.text(Math.round(current).toLocaleString('id-ID'));
                 }, refreshInterval);
             });
         });

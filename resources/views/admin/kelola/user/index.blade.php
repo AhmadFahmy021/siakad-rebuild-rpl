@@ -134,7 +134,7 @@
                             <label for="password" class="form-label">Password</label>
                             <input class="form-control @error('password')
                                 is-invalid
-                            @enderror" id="password" name="password" type="text" value="{{ Str::random(8) }}" placeholder="Masukkan password user" disabled>
+                            @enderror" id="password" name="password" type="text" value="{{ Str::random(8) }}" placeholder="Masukkan password user" readonly>
                             @error('password')
                                 <div class="invalid-feedback">
                                     {{ $message }}

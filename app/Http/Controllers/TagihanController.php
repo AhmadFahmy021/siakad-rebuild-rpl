@@ -45,7 +45,7 @@ class TagihanController extends Controller
             'deskripsi' => $request->deskripsi,
             'category' => $request->category,
             'nominal' => $request->nominal,
-            'kelas_id' => $request->user, // Assuming the select field name is 'kelas'
+            'kelas_id' => $request->kelas ?: null, // null = berlaku untuk semua kelas
         ];
 
         Tagihan::create($req);
@@ -88,7 +88,7 @@ class TagihanController extends Controller
             'deskripsi' => $request->deskripsi,
             'category' => $request->category,
             'nominal' => $request->nominal,
-            'kelas_id' => $request->user, // Assuming the select field name is 'kelas'
+            'kelas_id' => $request->kelas ?: null, // null = berlaku untuk semua kelas
         ];
 
         $tagihan->update($req);
