@@ -18,4 +18,20 @@ class Nilai extends Model
     {
         return $this->belongsTo(MataPelajaran::class, 'matapelajaran_id');
     }
+
+    /**
+     * Get the class that this grade belongs to.
+     */
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    /**
+     * Get the student that this grade belongs to.
+     */
+    public function siswa()
+    {
+        return $this->belongsTo(Siswa::class, 'siswa_id');
+    }
 }

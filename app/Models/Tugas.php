@@ -26,4 +26,20 @@ class Tugas extends Model
     {
         return $this->hasMany(PengumpulanTugas::class, 'tugas_id');
     }
+
+    /**
+     * Get the teacher who created this assignment.
+     */
+    public function guru()
+    {
+        return $this->belongsTo(Guru::class, 'guru_id');
+    }
+
+    /**
+     * Get the subject for this assignment.
+     */
+    public function matapelajaran()
+    {
+        return $this->belongsTo(MataPelajaran::class, 'matapelajaran_id');
+    }
 }

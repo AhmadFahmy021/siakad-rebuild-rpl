@@ -190,14 +190,7 @@
                                         @endforeach
                                     </tr>
 
-                                    <!-- Insert break row after the first slot if there are multiple slots -->
-                                    @if($idx == 0 && count($times) > 1)
-                                        <tr class="table-light text-center font-12 text-muted fw-medium">
-                                            <td colspan="6" class="py-1" style="background-color: #f8f9fa;">
-                                                <i class="mdi mdi-coffee-outline me-1"></i> Istirahat Pertama (09:00 - 09:30)
-                                            </td>
-                                        </tr>
-                                    @endif
+
                                 @empty
                                     <tr>
                                         <td colspan="6" class="text-center text-muted py-4 font-13">
@@ -237,24 +230,24 @@
                         <div class="d-flex flex-column gap-3">
                             @foreach($upcomingTasks as $t)
                                 @php
-                                    $tTitleLower = strtolower($t->title);
-                                    $subjTag = 'Tugas';
-                                    $tagColor = 'bg-secondary';
-                                    
-                                    if (str_contains($tTitleLower, 'trigonometri') || str_contains($tTitleLower, 'matematika')) {
-                                        $subjTag = 'Matematika';
-                                        $tagColor = 'bg-primary';
-                                    } elseif (str_contains($tTitleLower, 'reaksi') || str_contains($tTitleLower, 'kimia') || str_contains($tTitleLower, 'praktikum')) {
-                                        $subjTag = 'Fisika/Kimia';
-                                        $tagColor = 'bg-info';
-                                    } elseif (str_contains($tTitleLower, 'cerpen') || str_contains($tTitleLower, 'bahasa') || str_contains($tTitleLower, 'indo') || str_contains($tTitleLower, 'unsur')) {
-                                        $subjTag = 'B. Indonesia';
-                                        $tagColor = 'bg-danger';
-                                    }
+                                    $subjTag = $t->matapelajaran ? $t->matapelajaran->nama : 'Tugas';
+                                    $tagColor = 'bg-primary';
 
                                     $dueDate = \Carbon\Carbon::parse($t->due_date);
-                                    $remDays = $dueDate->diffInDays(\Carbon\Carbon::now());
-                                    $remDaysText = $remDays == 0 ? 'Hari Ini' : ($remDays + 1) . ' Hari Lagi';
+                                    $now = \Carbon\Carbon::now();
+                                    
+                                    if ($now->greaterThan($dueDate)) {
+                                        $remDaysText = 'Terlewat';
+                                    } else {
+                                        $daysRemaining = intval($now->copy()->startOfDay()->diffInDays($dueDate->copy()->startOfDay(), false));
+                                        if ($daysRemaining == 0) {
+                                            $remDaysText = 'Hari Ini';
+                                        } elseif ($daysRemaining == 1) {
+                                            $remDaysText = 'Besok';
+                                        } else {
+                                            $remDaysText = $daysRemaining . ' Hari Lagi';
+                                        }
+                                    }
                                 @endphp
                                 
                                 <div class="border rounded p-3 bg-light bg-opacity-25" style="border: 1px solid #eef2f7 !important;">

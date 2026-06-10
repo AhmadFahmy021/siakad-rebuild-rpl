@@ -19,6 +19,7 @@
                 <!-- Card Header -->
                 <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center pt-3 pb-0">
                     <span class="badge bg-soft-blue text-blue rounded px-2 py-1 font-11 fw-bold text-uppercase" style="background-color: rgba(91, 109, 240, 0.12) !important; color: #5b6df0 !important;">
+                        Tanggal Diberikan: {{ $feedbackDate }}
                     </span>
                 </div>
 
