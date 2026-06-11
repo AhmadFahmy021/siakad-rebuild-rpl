@@ -75,7 +75,73 @@ class DashboardController extends Controller
     }
 
     public function indexGuru()  {
-        return view('guru.index');
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+
+        // Today's teaching schedule
+        $todaySchedule = collect();
+        $totalSesiHariIni = 0;
+        $totalTugasPerluKoreksi = 0;
+
+        if ($guru) {
+            $hariMap = [
+                0 => 'Minggu', 1 => 'Senin', 2 => 'Selasa',
+                3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu',
+            ];
+            $hariIni = $hariMap[Carbon::now()->dayOfWeek] ?? 'Senin';
+
+            $todaySchedule = Jadwal::where('guru_id', $guru->id)
+                ->where('hari', $hariIni)
+                ->with(['matapelajaran', 'kelas'])
+                ->orderBy('jam_mulai', 'asc')
+                ->get();
+
+            $totalSesiHariIni = $todaySchedule->count();
+
+            // Active assignments that need grading (belonging to this guru)
+            $activeTugas = Tugas::where('guru_id', $guru->id)
+                ->where('status', 'PUBLISHED')
+                ->with(['kelas', 'matapelajaran', 'pengumpulanTugas'])
+                ->orderBy('due_date', 'asc')
+                ->take(5)
+                ->get();
+
+            // Calculate grading progress for each tugas
+            foreach ($activeTugas as $tugas) {
+                $kelasId = $tugas->kelas_id;
+                // Count total students in the class
+                $totalSiswa = \App\Models\SiswaKelas::where('kelas_id', $kelasId)->count();
+                $tugas->total_siswa = $totalSiswa;
+
+                // Count submissions that have been graded (dinilai)
+                $sudahDinilai = $tugas->pengumpulanTugas->where('status', 'dinilai')->count();
+                $tugas->sudah_dinilai = $sudahDinilai;
+
+                // Count all submissions
+                $sudahKumpul = $tugas->pengumpulanTugas->count();
+                $tugas->sudah_kumpul = $sudahKumpul;
+
+                // Batas pengumpulan
+                $tugas->batas_pengumpulan = Carbon::parse($tugas->due_date)->format('d M Y');
+            }
+
+            $totalTugasPerluKoreksi = Tugas::where('guru_id', $guru->id)
+                ->where('status', 'PUBLISHED')
+                ->whereHas('pengumpulanTugas', function($q) {
+                    $q->where('status', 'sudah_mengumpulkan');
+                })
+                ->count();
+        } else {
+            $activeTugas = collect();
+        }
+
+        return view('guru.index', compact(
+            'guru',
+            'todaySchedule',
+            'totalSesiHariIni',
+            'totalTugasPerluKoreksi',
+            'activeTugas'
+        ));
     }
 
     public function indexSiswa()  {

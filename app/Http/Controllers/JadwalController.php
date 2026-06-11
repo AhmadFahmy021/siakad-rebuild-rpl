@@ -123,4 +123,63 @@ class JadwalController extends Controller
         $jadwal = Jadwal::where('kelas_id', $siswaKelas->kelas->id)->with(['kelas', 'matapelajaran', 'guru'])->get();
         return view('ortu.jadwal.index', compact('jadwal'));
     }
+
+    public function indexGuru()
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+
+        $jadwalRaw = collect();
+        $scheduleMatrix = [];
+
+        if ($guru) {
+            $jadwalRaw = Jadwal::where('guru_id', $guru->id)
+                ->with(['matapelajaran', 'kelas'])
+                ->get();
+
+            // Extract unique timeslots
+            $uniqueTimeslots = [];
+            foreach ($jadwalRaw as $j) {
+                $start = \Carbon\Carbon::parse($j->jam_mulai)->format('H:i');
+                $end = \Carbon\Carbon::parse($j->jam_selesai)->format('H:i');
+                $timeLabel = $start . ' - ' . $end;
+                $uniqueTimeslots[$timeLabel] = [
+                    'start' => $j->jam_mulai,
+                    'end' => $j->jam_selesai,
+                ];
+            }
+
+            // Sort timeslots chronologically
+            uksort($uniqueTimeslots, function($a, $b) use ($uniqueTimeslots) {
+                return strtotime($uniqueTimeslots[$a]['start']) <=> strtotime($uniqueTimeslots[$b]['start']);
+            });
+
+            // Initialize matrix
+            foreach ($uniqueTimeslots as $timeLabel => $times) {
+                $scheduleMatrix[$timeLabel] = [
+                    'Senin' => null,
+                    'Selasa' => null,
+                    'Rabu' => null,
+                    'Kamis' => null,
+                    'Jumat' => null,
+                ];
+            }
+
+            // Populate matrix
+            foreach ($jadwalRaw as $j) {
+                $day = ucfirst(strtolower($j->hari));
+                $start = \Carbon\Carbon::parse($j->jam_mulai)->format('H:i');
+                $end = \Carbon\Carbon::parse($j->jam_selesai)->format('H:i');
+                $timeLabel = $start . ' - ' . $end;
+
+                if (isset($scheduleMatrix[$timeLabel]) && array_key_exists($day, $scheduleMatrix[$timeLabel])) {
+                    $scheduleMatrix[$timeLabel][$day] = $j;
+                }
+            }
+        }
+
+        $totalJadwal = $jadwalRaw->count();
+
+        return view('guru.jadwal', compact('scheduleMatrix', 'totalJadwal'));
+    }
 }
