@@ -1,9 +1,24 @@
 <div class="app-menu">
 
+    @php
+        $dashboardUrl = url('/');
+        if (Request::is('admin*')) {
+            $dashboardUrl = route('dashboard.admin');
+        } elseif (Request::is('guru*')) {
+            $dashboardUrl = route('dashboard.guru');
+        } elseif (Request::is('siswa*')) {
+            $dashboardUrl = route('dashboard.siswa');
+        } elseif (Request::is('tu*')) {
+            $dashboardUrl = route('dashboard.tu');
+        } elseif (Request::is('ortu*')) {
+            $dashboardUrl = route('dashboard.ortu');
+        }
+    @endphp
+
     <!-- Brand Logo -->
     <div class="logo-box">
         <!-- Brand Logo Light -->
-        <a href="index.html" class="logo-light">
+        <a href="{{ $dashboardUrl }}" class="logo-light">
             {{-- <img src="{{ asset('assets') }}/images/logo-dark-3.png" width="50%" alt="logo" class="logo-lg"> --}}
             <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 60px; height: auto;" alt="dark logo" class="logo-lg">
             <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 50px; height: auto;" alt="small logo" class="logo-sm">
@@ -11,7 +26,7 @@
         </a>
 
         <!-- Brand Logo Dark -->
-        <a href="index.html" class="logo-dark">
+        <a href="{{ $dashboardUrl }}" class="logo-dark">
             <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 60px; height: auto;" alt="dark logo" class="logo-lg">
             <img src="{{ asset('assets') }}/images/logo-dark-3.png" style="width: 50px; height: auto;" alt="small logo" class="logo-sm">
         </a>
@@ -168,6 +183,15 @@
                             <i data-feather="check-square"></i>
                         </span>
                         <span class="menu-text">Tugas / Assignment</span>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ Request::is('guru/jadwal*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ route('guru.jadwal.index') }}" class="menu-link {{ Request::is('guru/jadwal*') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i data-feather="calendar"></i>
+                        </span>
+                        <span class="menu-text">Jadwal</span>
                     </a>
                 </li>
 

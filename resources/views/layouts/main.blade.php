@@ -3,7 +3,23 @@
 
     <head>
         <meta charset="utf-8" />
-        <title>Dashboard | {{ config("app.name") }}</title>
+        @php
+            $segments = Request::segments();
+            $pageTitle = 'Dashboard';
+            
+            if (!empty($segments)) {
+                $lastSegment = end($segments);
+                // Exclude IDs or uuids (basic check for numbers or long strings)
+                if (is_numeric($lastSegment) || strlen($lastSegment) > 20) {
+                    $lastSegment = prev($segments);
+                }
+                
+                if ($lastSegment && strtolower($lastSegment) !== 'dashboard') {
+                    $pageTitle = ucwords(str_replace(['-', '_'], ' ', $lastSegment));
+                }
+            }
+        @endphp
+        <title>@yield('title', $pageTitle) | {{ config("app.name", "Siakad") }}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />

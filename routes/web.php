@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('guru')->middleware(['check.guru'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexGuru'])->name('dashboard.guru');
+        Route::get('/jadwal', [JadwalController::class, 'indexGuru'])->name('guru.jadwal.index');
         Route::get('/walas', [DashboardController::class, 'indexWalas'])->name('guru.walas.index');
         Route::get('/walas/siswa/{siswaId}', [DashboardController::class, 'showWalasSiswa'])->name('guru.walas.siswa');
         Route::post('/walas/siswa/{siswaId}/catatan', [DashboardController::class, 'storeWalasCatatan'])->name('guru.walas.catatan.store');
