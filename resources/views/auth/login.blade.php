@@ -53,6 +53,12 @@
                         <h4 class="mt-0">Log In</h4>
                         <p class="text-muted mb-4">Enter your email address and password to access account.</p>
 
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
                         <!-- form -->
                         <form action="{{ route('login') }}" method="POST">
                             @csrf
