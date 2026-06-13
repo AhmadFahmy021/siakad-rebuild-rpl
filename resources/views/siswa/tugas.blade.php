@@ -157,17 +157,25 @@
                             $submission = $tugas->pengumpulanTugas->first();
                             $dueDate = \Carbon\Carbon::parse($tugas->due_date);
                             $isLate = $dueDate->isPast();
-                            $remaining = $isLate ? 'Sudah Lewat Deadline' : $dueDate->diffForHumans(null, true) . ' Lagi';
 
                             $namaKelas = $tugas->kelas->name ?? '-';
                             $namaMapel = $tugas->matapelajaran->nama ?? 'Tugas Belajar';
                             $namaGuru = $tugas->guru->user->name ?? '-';
+                            
                             // Determine status for filter
                             $statusKey = 'belum';
                             if ($submission && $submission->status === 'dinilai') {
                                 $statusKey = 'dinilai';
                             } elseif ($submission && $submission->status === 'sudah_mengumpulkan') {
                                 $statusKey = 'dikumpul';
+                            }
+
+                            $isSelesai = $statusKey !== 'belum';
+                            
+                            if ($isSelesai) {
+                                $remaining = 'Tugas Selesai';
+                            } else {
+                                $remaining = $isLate ? 'Sudah Lewat Deadline' : $dueDate->diffForHumans(null, true) . ' Lagi';
                             }
                         @endphp
                         
@@ -217,7 +225,7 @@
                                             <span class="text-muted">
                                                 <i class="mdi mdi-calendar-clock-outline me-1"></i> {{ $dueDate->translatedFormat('d M Y, H:i') }}
                                             </span>
-                                            <small class="{{ $isLate ? 'text-danger' : 'text-warning' }} fw-semibold">
+                                            <small class="{{ $isSelesai ? 'text-success' : ($isLate ? 'text-danger' : 'text-warning') }} fw-semibold">
                                                 {{ $remaining }}
                                             </small>
                                         </div>

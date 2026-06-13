@@ -75,8 +75,8 @@
                         <div class="col-8">
                             <div class="text-end">
                                 @if($upcomingJadwal)
-                                    <h5 class="text-dark mt-1 mb-0 text-truncate" title="{{ $upcomingJadwal->matapelajaran->nama }}">
-                                        {{ $upcomingJadwal->matapelajaran->nama }}
+                                    <h5 class="text-dark mt-1 mb-0 text-truncate" title="{{ $upcomingJadwal->matapelajaran?->nama ?? 'Tidak ada mapel' }}">
+                                        {{ $upcomingJadwal->matapelajaran?->nama ?? 'Tidak ada mapel' }}
                                     </h5>
                                     <p class="text-muted mb-0 text-truncate">
                                        <span class="text-capitalize">{{ $upcomingJadwal->hari }}</span>  ({{ substr($upcomingJadwal->jam_mulai, 0, 5) }} - {{ substr($upcomingJadwal->jam_selesai, 0, 5) }})
@@ -121,11 +121,11 @@
                                             <td class="align-middle">
                                                 @if ($days[$day])
                                                     <div class="p-1 rounded bg-soft-info text-info">
-                                                        <span class="d-block fw-bold text-truncate" title="{{ $days[$day]->matapelajaran->nama }}">
-                                                            {{ $days[$day]->matapelajaran->nama }}
+                                                        <span class="d-block fw-bold text-truncate" title="{{ $days[$day]->matapelajaran?->nama ?? 'Tidak ada mapel' }}">
+                                                            {{ $days[$day]->matapelajaran?->nama ?? 'Tidak ada mapel' }}
                                                         </span>
-                                                        <small class="d-block text-muted text-truncate" title="{{ $days[$day]->guru->user->name }}">
-                                                            {{ $days[$day]->guru->user->name }}
+                                                        <small class="d-block text-muted text-truncate" title="{{ $days[$day]->guru?->user?->name ?? 'Tidak ada guru' }}">
+                                                            {{ $days[$day]->guru?->user?->name ?? 'Tidak ada guru' }}
                                                         </small>
                                                     </div>
                                                 @else

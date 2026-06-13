@@ -37,5 +37,7 @@ class HomeController extends Controller
         } else if (TataUsaha::where('user_id', Auth::user()->id)->exists()) {
             return redirect('tu/dashboard');
         }
+
+        return view('auth.no-role');
     }
 }
