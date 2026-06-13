@@ -24,17 +24,18 @@ class AuthOrtuController extends Controller
         //     return redirect()->intended('/ortu/dashboard');
         // }
 
-        $siswa = Siswa::where('nama_ortu', $request->namaorangtua)->first();
-        // dd($siswa);
-        if ($siswa && $siswa->nama_ortu === $request->namaorangtua) {
-            // Simpan informasi siswa di session
-            $user = User::where('id', $siswa->user_id)->first();
-            if ($user && $user->name == $request->namasiswa) {
-                // auth()->login($user);
-                session(['ortu_login' => true, 'siswa_id' => $siswa->id, 'siswa_nama' => $user->name, 'nama_ortu' => $siswa->nama_ortu]);
-                return redirect('/ortu/dashboard');
-                // dd("Login berhasil! Nama Siswa: " . $user->name . ", Nama Orang Tua: " . $siswa->nama_ortu);
-            }
+        $siswa = Siswa::whereHas('user', function ($query) use ($request) {
+            $query->where('name', $request->namasiswa);
+        })->where('nama_ortu', $request->namaorangtua)->first();
+
+        if ($siswa) {
+            session([
+                'ortu_login' => true, 
+                'siswa_id' => $siswa->id, 
+                'siswa_nama' => $siswa->user->name, 
+                'nama_ortu' => $siswa->nama_ortu
+            ]);
+            return redirect('/ortu/dashboard');
         }
 
         return back()->withErrors(['namasiswa' => 'Nama siswa atau nama orang tua salah.', 'namaorangtua' => 'Nama siswa atau nama orang tua salah.'])->withInput();

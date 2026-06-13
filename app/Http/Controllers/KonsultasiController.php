@@ -49,6 +49,45 @@ class KonsultasiController extends Controller
         ));
     }
 
+    public function indexOrtu()
+    {
+        $siswaId = session('siswa_id');
+        $siswa = Siswa::find($siswaId);
+        
+        if (!$siswa) {
+            abort(403, 'Hanya orang tua yang dapat mengakses halaman ini.');
+        }
+
+        $kelas = $siswa->kelas()->first();
+        $waliKelas = $kelas ? $kelas->guru : null;
+
+        // Fetch the latest wali kelas feedback/bimbingan
+        $konsultasi = Konsultasi::where('siswa_id', $siswa->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        // MVC: Move all presentation calculations to controller
+        $studentName = $siswa->user->name; // Use student's name, not Auth::user() because Auth::user() is the parent
+        $className = $kelas->name ?? 'Belum Ditentukan';
+        
+        $teacherName = $waliKelas->user->name ?? 'Belum Ditentukan';
+        $teacherSubject = $waliKelas ? 'Wali Kelas ' . $className . ' & Guru' : 'Belum Ada Wali Kelas';
+        
+        $feedbackTitle = $konsultasi->title ?? 'Catatan belum diberikan wali kelas';
+        $feedbackDate = $konsultasi ? \Carbon\Carbon::parse($konsultasi->updated_at)->translatedFormat('d F Y') : null;
+        $feedbackText = $konsultasi->description ?? 'Belum ada catatan perkembangan yang diberikan oleh wali kelas Anda untuk semester ini.';
+
+        return view('siswa.konsultasi', compact(
+            'studentName',  
+            'className',  
+            'teacherName', 
+            'teacherSubject', 
+            'feedbackTitle', 
+            'feedbackDate', 
+            'feedbackText'
+        ));
+    }
+
     /**
      * Show the form for creating a new resource.
      */

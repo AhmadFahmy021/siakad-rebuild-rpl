@@ -48,7 +48,7 @@
                                     <td>{{ $item->nominal }}</td>
                                     <td>
                                         @if ($item->bukti_pembayaran)
-                                            <img src="{{ asset('storage/' . $item->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-thumbnail" style="max-width: 100px;">
+                                            <img src="{{ asset('storage/' . $item->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-thumbnail" style="max-width: 100px; cursor: pointer;" onclick="Swal.fire({ imageUrl: '{{ asset('storage/' . $item->bukti_pembayaran) }}', imageAlt: 'Bukti Pembayaran', showConfirmButton: false, showCloseButton: true, width: 'auto' })">
                                         @else
                                             <span class="badge bg-danger">Tidak Ada Bukti</span>
                                         @endif
@@ -75,8 +75,20 @@
                                                 disabled
                                             @endif" data-confirm-delete="true">Delete</a>
                                         @else
-                                            <a href="" class="btn btn-outline-secondary btn-sm"     >Approve</a>
-                                            <a href="" class="btn btn-outline-danger btn-sm" >Reject</a>
+                                            @if ($item->status == 'approved')
+                                                <button type="button" class="btn btn-success btn-sm" onclick="Swal.fire('Info', 'Pembayaran ini sudah di-approve.', 'info')">Approved</button>
+                                            @else
+                                                <form action="{{ route('tu.pembayaran.approve', $item->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-outline-success btn-sm">Approve</button>
+                                                </form>
+                                                <form action="{{ route('tu.pembayaran.reject', $item->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
+                                                </form>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>

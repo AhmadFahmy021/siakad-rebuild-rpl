@@ -175,6 +175,20 @@ class PembayaranController extends Controller
     }
 
 
+    public function approve(Pembayaran $pembayaran)
+    {
+        $pembayaran->update(['status' => 'approved']);
+        Alert::success('Berhasil', 'Pembayaran berhasil di-approve.');
+        return back();
+    }
+
+    public function reject(Pembayaran $pembayaran)
+    {
+        $pembayaran->update(['status' => 'rejected']);
+        Alert::success('Berhasil', 'Pembayaran berhasil di-reject.');
+        return back();
+    }
+
     public function getSiswaByKelas(string $kelasId)
     {
 

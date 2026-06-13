@@ -70,7 +70,7 @@ class TataUsahaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, TataUsaha $tataUsaha)
+    public function update(Request $request, TataUsaha $tu)
     {
         $request->validate([
             'user' => 'required|exists:users,id',
@@ -80,12 +80,12 @@ class TataUsahaController extends Controller
             'user_id' => $request->user,
         ];
 
-        if (TataUsaha::where('user_id', $request->user)->where('id', '!=', $tataUsaha->id)->exists()) {
+        if (TataUsaha::where('user_id', $request->user)->where('id', '!=', $tu->id)->exists()) {
             Alert::error('Gagal', 'Tata Usaha sudah terdaftar.');
             return redirect()->route('tu.index');
         }
 
-        $tataUsaha->update($req);
+        $tu->update($req);
         Alert::success('Berhasil', 'Tata Usaha berhasil diperbarui.');
         return redirect()->route('tu.index');
     }
@@ -93,9 +93,9 @@ class TataUsahaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TataUsaha $tataUsaha)
+    public function destroy(TataUsaha $tu)
     {
-        $tataUsaha->delete();
+        $tu->delete();
         Alert::success('Berhasil', 'Tata Usaha berhasil dihapus.');
         return redirect()->route('tu.index');
     }

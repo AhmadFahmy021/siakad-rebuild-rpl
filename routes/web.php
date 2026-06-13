@@ -39,6 +39,8 @@ Route::middleware(['check.orangtua'])->prefix('ortu')->group(function () {
         Route::post('/{tagihan}', [PembayaranController::class, 'bayarStore']);
     });
     Route::get('jadwal', [JadwalController::class, 'indexOrtu']);
+    Route::get('nilai', [NilaiController::class, 'indexOrtu'])->name('ortu.nilai.index');
+    Route::get('catatan', [KonsultasiController::class, 'indexOrtu'])->name('ortu.catatan.index');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -99,6 +101,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kelas/{kelas}/kelola', [KelasController::class, 'kelola']);
         Route::post('/kelas/{kelas}/kelola', [KelasController::class, 'kelolaStore']);
         Route::resource('/pembayaran', PembayaranController::class);
+        Route::patch('/pembayaran/{pembayaran}/approve', [PembayaranController::class, 'approve'])->name('tu.pembayaran.approve');
+        Route::patch('/pembayaran/{pembayaran}/reject', [PembayaranController::class, 'reject'])->name('tu.pembayaran.reject');
         Route::resource('/matapelajaran', MataPelajaranController::class)->parameters(['matapelajaran' => 'mataPelajaran']);
         Route::resource('/jadwal', JadwalController::class)->parameters(['jadwal' => 'jadwal']);
     });
