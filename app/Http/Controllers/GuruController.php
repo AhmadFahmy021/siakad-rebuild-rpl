@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
@@ -9,80 +8,84 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class GuruController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $gurus = Guru::with('user')->get();
         $users = User::all();
-        confirmDelete("Delete Akses Guru!","Apakah Anda yakin ingin menghapus guru ini?");
+        confirmDelete("Delete Akses Guru!", "Apakah Anda yakin ingin menghapus guru ini?");
         return view('admin.kelola.guru.index', compact('gurus', 'users'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        // Sudah pakai modal di index, tidak perlu halaman terpisah
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'user' => 'required|exists:users,id',
         ]);
 
-        $req = [
-            'user_id' => $request->user,
-        ];
-
         if (Guru::where('user_id', $request->user)->exists()) {
             Alert::error('Gagal', 'Guru sudah terdaftar.');
-            // Alert::toast('Guru sudah terdaftar.', 'error');
             return redirect()->route('guru.index');
         }
 
-        Guru::create($req);
+        Guru::create(['user_id' => $request->user]);
         Alert::success('Berhasil', 'Guru berhasil ditambahkan.');
         return redirect()->route('guru.index');
-        }
+    }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Guru $guru)
     {
-        //
+        // Tidak diperlukan — info sudah tampil di tabel index
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * ── BARU: Isi method edit() ──────────────────────────────────────
+     * Mengembalikan data guru dalam format JSON
+     * Dipakai oleh modal edit via AJAX (tanpa pindah halaman)
      */
     public function edit(Guru $guru)
     {
-        //
+        // Load relasi user agar nama & email ikut terkirim ke modal
+        $guru->load('user');
+
+        return response()->json([
+            'id'       => $guru->id,
+            'user_id'  => $guru->user_id,
+            'name'     => $guru->user->name,
+            'email'    => $guru->user->email,
+            'username' => $guru->user->username,
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * ── BARU: Isi method update() ────────────────────────────────────
+     * Ganti user yang terhubung ke akun guru ini
      */
     public function update(Request $request, Guru $guru)
     {
-        //
+        $request->validate([
+            'user' => 'required|exists:users,id',
+        ]);
+
+        // Cek apakah user yang dipilih sudah dipakai guru LAIN
+        $sudahAda = Guru::where('user_id', $request->user)
+            ->where('id', '!=', $guru->id) // kecualikan guru ini sendiri
+            ->exists();
+
+        if ($sudahAda) {
+            Alert::error('Gagal', 'User ini sudah terdaftar sebagai guru lain.');
+            return redirect()->route('guru.index');
+        }
+
+        $guru->update(['user_id' => $request->user]);
+        Alert::success('Berhasil', 'Data guru berhasil diperbarui.');
+        return redirect()->route('guru.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Guru $guru)
     {
         $guru->delete();
