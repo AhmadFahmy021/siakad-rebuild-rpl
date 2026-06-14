@@ -314,6 +314,16 @@
                         <span class="menu-text">Jadwal</span>
                     </a>
                 </li>
+                <li class="menu-item {{ Request::is('ortu/nilai*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/nilai') }}" class="menu-link {{ Request::is('ortu/nilai*') ? 'active' : '' }}">
+                        <span class="menu-text">Nilai Akademik</span>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('ortu/catatan*') ? 'menuitem-active' : '' }}">
+                    <a href="{{ url('ortu/catatan') }}" class="menu-link {{ Request::is('ortu/catatan*') ? 'active' : '' }}">
+                        <span class="menu-text">Catatan Walas</span>
+                    </a>
+                </li>
 
             @endif
 
