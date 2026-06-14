@@ -39,7 +39,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($gurus as $i => $item)
+                        @forelse($gurus as $i => $item)
                             <tr>
                                 <td>{{ $i + 1 }}</td>
                                 <td>{{ $item->user->name }}</td>
@@ -103,7 +103,7 @@
                         <select class="form-select @error('user') is-invalid @enderror"
                                 id="name" name="user">
                             <option selected disabled>Choose a user</option>
-                            @foreach ($users as $user)
+                            @foreach($users as $user)
                                 <option value="{{ $user->id }}">
                                     {{ $user->name }} | {{ $user->email }} | {{ $user->username }}
                                 </option>
@@ -159,7 +159,7 @@
                         <label class="form-label">Ganti User <span class="text-danger">*</span></label>
                         <select class="form-select" name="user" id="edit-user-select" required>
                             <option selected disabled>Pilih user pengganti</option>
-                            @foreach ($users as $user)
+                            @foreach($users as $user)
                                 <option value="{{ $user->id }}"
                                         data-name="{{ $user->name }}"
                                         data-email="{{ $user->email }}">
@@ -202,7 +202,7 @@
      * 5. Buka modal
      *
      * Kenapa tidak pakai AJAX fetch?
-     * Data sudah tersedia dari @foreach di atas (dikirim lewat parameter onclick)
+     * Data sudah tersedia dari loop foreach di atas (dikirim lewat parameter onclick)
      * → lebih cepat, tidak perlu request tambahan ke server
      */
     function editGuru(guruId, namaGuru, emailGuru, currentUserId) {
